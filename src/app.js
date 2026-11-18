@@ -4,7 +4,8 @@ import { PHOTOS } from "./photos.js";
 import { videoInfo, platformName, shrinkImage } from "./media.js";
 import { all, put, remove, clearAll, exportAll, importAll, getSetting, setSetting } from "./store.js";
 import { today, weekly, streakWeeks, totals, practice, statusOf, statusCounts, suggestions, findUrl, igInfo, tagUrl } from "./stats.js";
-import { SNAP_KEY, encodeSnap, decodeSnap, snapFromText, buildSnap, together, compare, sameName } from "./social.js";
+import { SNAP_KEY, encodeSnap, decodeSnap, snapFromText, buildSnap, validateSnap, together, compare, sameName } from "./social.js";
+import { syncConfigured, pushSnap, pullSnaps, deleteSnap, newKey } from "./sync.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -32,7 +33,8 @@ const S = {
   sheet: null,
   install: null,
   friends: [], // snapshots friends shared with you: { id, name, at, p, x, rc, stats, alias, received }
-  me: getSetting("me", null), // { id, name, note }
+  me: getSetting("me", null), // { id, name, note, key } (key: write key for the sync server, made when sync is turned on)
+  sync: getSetting("sync", false),
   thumbs: getSetting("thumbs", false), // show YouTube video thumbnails (loaded from i.ytimg.com)
   AP: null, // Acropedia library, loaded on first use
   lib: { q: "", tag: "", n: LIB_PAGE }
@@ -65,7 +67,10 @@ const thumbOf = (id) => myPhotos(id)[0]?.url || refPhotos(id)[0]?.src || ytThumb
 const idName = (id, fr) => (S.items.has(id) ? nm(S.items.get(id)) : fr?.x?.[id] || S.AP?.find((a) => "ap-" + a[0] === id)?.[1] || id.replace(/^(u|ap)-/, ""));
 const friendOf = (partner) => S.friends.find((f) => sameName(f.alias || f.name, partner));
 const daysAgo = (iso) => Math.max(0, Math.floor((Date.now() - new Date(iso)) / 864e5));
-const markChanged = () => setSetting("changed", new Date().toISOString());
+const markChanged = () => {
+  setSetting("changed", new Date().toISOString());
+  schedulePush();
+};
 const link = (url, text) => `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>`;
 const opt = (v, label, sel) => `<option value="${esc(v)}" ${String(v) === String(sel) ? "selected" : ""}>${esc(label)}</option>`;
 
@@ -169,6 +174,7 @@ function goto(tab) {
   $$("#tabs button").forEach((b) => b.setAttribute("aria-current", b.dataset.goto === tab ? "page" : "false"));
   if (location.hash !== "#" + tab) history.replaceState(null, "", "#" + tab);
   window.scrollTo(0, 0);
+  if (tab === "friends") pullFriends();
 }
 
 // ---------- lists ----------
@@ -429,13 +435,111 @@ function myNames() {
   return out;
 }
 
-async function myLink() {
-  const snap = buildSnap({
-    me: S.me, roles: S.roles, progress: S.progress, sessions: S.sessions, names: myNames(),
-    stats: { sessions: S.sessions.length, minutes: totals(S.sessions).minutes, streak: streakWeeks(S.sessions) },
-    includeSessions: getSetting("shareSessions", true)
-  });
-  return `${location.origin}${location.pathname}#${SNAP_KEY}${await encodeSnap(snap)}`;
+const mySnap = () => buildSnap({
+  me: S.me, roles: S.roles, progress: S.progress, sessions: S.sessions, names: myNames(),
+  stats: { sessions: S.sessions.length, minutes: totals(S.sessions).minutes, streak: streakWeeks(S.sessions) },
+  includeSessions: getSetting("shareSessions", true)
+});
+
+const myLink = async () => `${location.origin}${location.pathname}#${SNAP_KEY}${await encodeSnap(mySnap())}`;
+
+// ---------- automatic sync (optional; server/worker.js) ----------
+// Upload: a few seconds after a change, and when the app goes to the background. Download: when the app
+// opens, comes back online, or you open Friends (at most every 2 minutes unless you tap Refresh).
+const syncOn = () => S.sync && syncConfigured() && S.me?.id && S.me?.key;
+const SYNC_DELAY = 8000;
+let pushTimer = null, lastPull = 0, syncing = false;
+
+function schedulePush() {
+  if (!syncOn()) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushMine, SYNC_DELAY);
+}
+
+async function pushMine() {
+  clearTimeout(pushTimer);
+  pushTimer = null;
+  if (!syncOn() || !S.me.name || !navigator.onLine) return;
+  try {
+    await pushSnap(mySnap(), S.me.key);
+    setSetting("lastPush", new Date().toISOString());
+    setSetting("syncErr", "");
+  } catch (e) {
+    if (e.status === 429) return schedulePush();
+    setSetting("syncErr", String(e.message || e));
+  }
+  renderFriends();
+}
+
+async function pullFriends(force = false) {
+  if (!syncOn() || !S.friends.length || syncing || !navigator.onLine) return;
+  if (!force && Date.now() - lastPull < 120000) return;
+  syncing = true;
+  lastPull = Date.now();
+  try {
+    const got = await pullSnaps(S.friends.map((f) => f.id));
+    const updated = [];
+    for (const [id, raw] of Object.entries(got)) {
+      let snap;
+      try { snap = validateSnap(raw); } catch { continue; }
+      const old = S.friends.find((f) => f.id === id);
+      if (!old || snap.id !== id || snap.at <= old.at) continue;
+      const rec = { ...snap, alias: old.alias, received: new Date().toISOString() };
+      await put("friends", rec);
+      S.friends = [rec, ...S.friends.filter((f) => f.id !== id)];
+      updated.push(snap.name);
+    }
+    S.friends.sort((a, b) => (b.at || "").localeCompare(a.at || ""));
+    setSetting("lastPull", new Date().toISOString());
+    setSetting("syncErr", "");
+    if (updated.length) {
+      refresh();
+      renderSheet();
+      toast(t("sync_updated", { x: updated.join(", ") }));
+    } else if (force) toast(t("sync_nothing"));
+  } catch (e) {
+    setSetting("syncErr", String(e.message || e));
+    if (force) toast(t("sync_err"));
+  } finally {
+    syncing = false;
+    renderFriends();
+  }
+}
+
+async function setSync(on) {
+  if (on) {
+    if (!S.me?.name) return toast(t("me_needed"));
+    S.me = { ...S.me, key: S.me.key || newKey() };
+    setSetting("me", S.me);
+    S.sync = true;
+    setSetting("sync", true);
+    await pushMine();
+    await pullFriends(true);
+  } else {
+    S.sync = false;
+    setSetting("sync", false);
+    clearTimeout(pushTimer);
+    try {
+      if (S.me?.key && syncConfigured()) await deleteSnap(S.me.id, S.me.key);
+      toast(t("sync_off_done"));
+    } catch {
+      toast(t("sync_off_offline"));
+    }
+    renderFriends();
+  }
+}
+
+function syncHtml() {
+  if (!syncConfigured()) return "";
+  const err = getSetting("syncErr", "");
+  const push = getSetting("lastPush", ""), pull = getSetting("lastPull", "");
+  const when = (iso) => (iso ? new Date(iso).toLocaleString(S.lang, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "–");
+  return `<div class="sync-box">
+    <label class="check"><input type="checkbox" id="sync-on" ${S.sync ? "checked" : ""}><span><b>${esc(t("sync_label"))}</b></span></label>
+    <p class="hint">${esc(t("sync_hint"))}</p>
+    ${S.sync ? `<p class="${err ? "alert err" : "hint"}">${esc(err ? t("sync_err") : t("sync_status", { a: when(push), b: when(pull) }))}</p>
+      <button type="button" class="btn small" data-act="sync-now">${esc(t("sync_refresh"))}</button>` : ""}
+  </div>`;
 }
 
 async function shareMine() {
@@ -531,7 +635,8 @@ function renderFriends() {
     <button type="button" class="btn primary wide" data-act="me-save">${esc(t("save"))}</button>`
     : `<div class="sess-top"><h2>${esc(me.name)}</h2><button type="button" class="btn small ghost" data-act="me-edit">${esc(t("edit"))}</button></div>
     ${me.note ? `<p class="hint">${esc(me.note)}</p>` : ""}
-    ${stale ? `<p class="alert warn">${esc(t("share_stale", { d: fmtDate(shared.slice(0, 10)) }))}</p>`
+    ${syncHtml()}
+    ${stale && !syncOn() ? `<p class="alert warn">${esc(t("share_stale", { d: fmtDate(shared.slice(0, 10)) }))}</p>`
       : `<p class="hint">${esc(shared ? t("share_last", { d: fmtDate(shared.slice(0, 10)) }) : t("share_never"))}</p>`}
     <div class="row">
       <button type="button" class="btn primary" data-act="share-me">${esc(t(shared ? "share_update" : "share_btn"))}</button>
@@ -928,11 +1033,15 @@ async function onClick(e) {
     case "me-save": {
       const name = $("#me-name").value.trim().slice(0, 40);
       if (!name) return toast(t("me_needed"));
-      S.me = { id: S.me?.id || uid(), name, note: $("#me-note").value.trim().slice(0, 120) };
+      S.me = { ...S.me, id: S.me?.id || uid(), name, note: $("#me-note").value.trim().slice(0, 120) };
       setSetting("me", S.me);
       S.editingMe = false;
+      schedulePush();
       return renderFriends();
     }
+    case "sync-now":
+      await pushMine();
+      return pullFriends(true);
     case "share-me": return shareMine();
     case "copy-me": return copyMine();
     case "friend": return openSheet({ type: "friend", id });
@@ -1104,6 +1213,8 @@ async function onClick(e) {
     }
     case "export": {
       const data = await exportAll();
+      // Your profile (and sync key) moves with the backup, so a new phone keeps the same identity for friends.
+      if (S.me) Object.assign(data, { me: S.me, sync: S.sync });
       const blob = new Blob([JSON.stringify(data, null, 1)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -1123,9 +1234,14 @@ async function onClick(e) {
     }
     case "delete-all": {
       if (!confirm(t("delete_all_confirm"))) return;
+      if (S.me?.key && syncConfigured()) {
+        clearTimeout(pushTimer);
+        try { await deleteSnap(S.me.id, S.me.key); } catch { toast(t("sync_off_offline")); }
+      }
       await clearAll();
       S.me = null;
       S.thumbs = false;
+      S.sync = false;
       await load();
       resetDraft();
       renderAll();
@@ -1174,7 +1290,11 @@ async function onChange(e) {
     if (el.id === "lib-thumbs") $("#lib-list").innerHTML = libList();
     return refresh();
   }
-  if (el.id === "share-sessions") return setSetting("shareSessions", el.checked);
+  if (el.id === "share-sessions") {
+    setSetting("shareSessions", el.checked);
+    return schedulePush();
+  }
+  if (el.id === "sync-on") return setSync(el.checked);
   if (el.id === "friend-alias") {
     const fr = S.friends.find((f) => f.id === el.dataset.id);
     if (!fr) return;
@@ -1199,7 +1319,15 @@ async function onChange(e) {
   }
   if (el.id === "import" && el.files?.[0]) {
     try {
-      const n = await importAll(JSON.parse(await el.files[0].text()));
+      const data = JSON.parse(await el.files[0].text());
+      const n = await importAll(data);
+      const me = data.me;
+      if (me && typeof me.id === "string" && typeof me.name === "string") {
+        S.me = { id: me.id.slice(0, 80), name: me.name.slice(0, 40), note: String(me.note || "").slice(0, 120), ...(typeof me.key === "string" && { key: me.key }) };
+        setSetting("me", S.me);
+        S.sync = !!data.sync && !!S.me.key;
+        setSetting("sync", S.sync);
+      }
       await load();
       renderAll();
       toast(t("imported", { n }));
@@ -1254,6 +1382,16 @@ async function init() {
     S.lib.q = e.target.value;
     S.lib.n = LIB_PAGE;
     $("#lib-list").innerHTML = libList();
+  });
+  // Sync (only when turned on): catch up on open and when back online; flush pending uploads when leaving.
+  if (syncOn()) {
+    if (getSetting("changed", "") > getSetting("lastPush", "")) pushMine();
+    pullFriends();
+  }
+  window.addEventListener("online", () => { if (syncOn()) { pushMine(); lastPull = 0; pullFriends(); } });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && pushTimer) pushMine();
+    if (document.visibilityState === "visible") pullFriends();
   });
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();

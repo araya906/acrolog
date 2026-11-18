@@ -152,7 +152,7 @@ export default {
   privacy_points: [
     "No accounts, no tracking, no ads.",
     "Your progress, sessions, links and photos stay in this browser on this device. AcroLog has no server: only what you share with your Friends link leaves the phone, and only to the people you send it to.",
-    "Once installed, the app opens from your phone and makes no internet requests by itself. Internet is used only when you tap a link, Play / Preview a video, Check for updates, or turn on video thumbnails.",
+    "Once installed, the app opens from your phone and makes no internet requests by itself. Internet is used only when you tap a link, Play / Preview a video, Check for updates, turn on video thumbnails, or turn on automatic sync with friends (then it talks to the AcroLog sync server when it opens and after changes).",
     "Uninstalling the app or clearing site data deletes them: keep a backup."
   ],
   delete_all: "Delete all my data",
@@ -242,6 +242,16 @@ export default {
   log_partners_hint: "People you practised with who aren't linked to a friend yet.",
   last_on: "last on {d}",
   friends_on_item: "Friends:",
+  // Automatic sync
+  sync_label: "Keep friends updated automatically",
+  sync_hint: "Uploads your snapshot (the same data as your link) to the AcroLog sync server a few seconds after each change, and downloads your friends' latest progress when you open the app. Friends need it on too. Turning it off deletes your copy from the server.",
+  sync_status: "Uploaded {a} · checked friends {b}",
+  sync_refresh: "Sync now",
+  sync_err: "Could not reach the sync server. It will retry next time you are online.",
+  sync_updated: "Updated: {x}",
+  sync_nothing: "Your friends have no new updates.",
+  sync_off_done: "Sync off. Your copy was deleted from the server.",
+  sync_off_offline: "Sync off, but the server could not be reached to delete your copy. Turn it on and off again when online.",
   install_btn: "Install app",
   install_hint: "Works offline once installed."
 };

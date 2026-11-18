@@ -1,0 +1,15 @@
+# Cloudflare Worker for AcroLog sync. Setup steps: see server/README.md.
+name = "acrolog-sync"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+
+[vars]
+# Who may call the API from a browser. "*" works everywhere; once the app has its final address, set it,
+# e.g. "https://araya906.github.io" (several: comma-separated; add "http://localhost:8124" for local testing).
+ALLOWED_ORIGINS = "*"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "acrolog"
+# Paste the id printed by `npx wrangler d1 create acrolog` here.
+database_id = "00000000-0000-0000-0000-000000000000"

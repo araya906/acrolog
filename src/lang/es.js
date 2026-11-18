@@ -152,7 +152,7 @@ export default {
   privacy_points: [
     "Sin cuentas, sin seguimiento, sin anuncios.",
     "Tu progreso, sesiones, enlaces y fotos se quedan en este navegador y este dispositivo. AcroLog no tiene servidor: solo sale lo que tú compartes con tu enlace de Amigos, y va únicamente a quien se lo envíes.",
-    "Una vez instalada, la app se abre desde tu móvil y no hace ninguna petición a internet por sí sola. Solo se usa internet al pulsar un enlace, Ver / Vista previa de un vídeo, Buscar actualizaciones o si activas las miniaturas de vídeo.",
+    "Una vez instalada, la app se abre desde tu móvil y no hace ninguna petición a internet por sí sola. Solo se usa internet al pulsar un enlace, Ver / Vista previa de un vídeo, Buscar actualizaciones, si activas las miniaturas de vídeo o si activas la sincronización con amigos (entonces contacta con el servidor de sincronización de AcroLog al abrirse y tras cada cambio).",
     "Desinstalar la app o borrar los datos del sitio los elimina: guarda una copia."
   ],
   delete_all: "Borrar todos mis datos",
@@ -242,6 +242,16 @@ export default {
   log_partners_hint: "Personas con las que has practicado que aún no están vinculadas a un amigo.",
   last_on: "última el {d}",
   friends_on_item: "Amigos:",
+  // Sincronización automática
+  sync_label: "Mantener a mis amigos al día automáticamente",
+  sync_hint: "Sube tu resumen (los mismos datos que tu enlace) al servidor de sincronización de AcroLog unos segundos después de cada cambio, y descarga el último progreso de tus amigos al abrir la app. Tus amigos también deben activarlo. Al desactivarlo se borra tu copia del servidor.",
+  sync_status: "Subido {a} · amigos comprobados {b}",
+  sync_refresh: "Sincronizar ahora",
+  sync_err: "No se pudo conectar con el servidor de sincronización. Lo reintentará la próxima vez que tengas conexión.",
+  sync_updated: "Actualizado: {x}",
+  sync_nothing: "Tus amigos no tienen novedades.",
+  sync_off_done: "Sincronización desactivada. Tu copia se borró del servidor.",
+  sync_off_offline: "Sincronización desactivada, pero no se pudo conectar con el servidor para borrar tu copia. Actívala y desactívala de nuevo con conexión.",
   install_btn: "Instalar app",
   install_hint: "Funciona sin conexión una vez instalada."
 };
