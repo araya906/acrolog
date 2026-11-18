@@ -207,3 +207,22 @@ table.sum td.n { text-align: right; color: var(--muted); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabs-h) + 16px + env(safe-area-inset-bottom));
   background: var(--head); color: var(--head-ink); padding: 10px 16px; border-radius: 999px; z-index: 300; font-size: .92rem;
   max-width: calc(100% - 32px); box-shadow: 0 4px 16px #0004; }
+
+/* library, friends */
+.check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; margin: 8px 0; }
+.check input { width: auto; flex: none; margin-top: 3px; }
+.check span { font-weight: 400 !important; margin: 0 !important; display: inline !important; }
+.lib-row { position: relative; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  padding: 10px 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
+.lib-row.has-thumb { padding-right: 120px; min-height: 84px; }
+.lib-row .thumb { position: absolute; right: 8px; top: 8px; width: 104px; height: 58px; object-fit: cover; border-radius: 8px; background: var(--bg); }
+.lib-row .row { font-size: .9rem; }
+.lib-row .embed { margin-top: 6px; }
+.friends-on { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0 10px; }
+.chip small { color: var(--muted); font-size: .78rem; }
+.chip:disabled { cursor: default; opacity: .8; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: .8rem; word-break: break-all; }
+#me-card .sess-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+#me-card .sess-top h2 { margin: 0; }
+table.sum .link { padding: 0; text-align: left; }
+.lib-row a, .friends-on a { color: var(--accent); }

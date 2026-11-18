@@ -2,8 +2,8 @@
 const DB = "acro-log";
 import { blobToDataUrl, dataUrlToBlob } from "./media.js";
 
-const VER = 2; // 2: "photos" store (your own photos of a figure, as image blobs)
-export const STORES = ["items", "progress", "sessions", "refs", "photos"];
+const VER = 3; // 2: "photos" store (your own photos of a figure, as image blobs). 3: "friends" (snapshots friends shared)
+export const STORES = ["items", "progress", "sessions", "refs", "photos", "friends"];
 let dbp = null;
 const mem = Object.fromEntries(STORES.map((s) => [s, new Map()]));
 
@@ -72,7 +72,7 @@ export async function clearAll() {
 
 // Backup: one JSON file with every store (photos as data: URLs). Import merges (same id = replaced).
 export async function exportAll() {
-  const out = { app: "acro-log", version: 2, exported: new Date().toISOString() };
+  const out = { app: "acro-log", version: 3, exported: new Date().toISOString() };
   for (const s of STORES) out[s] = await all(s);
   out.photos = await Promise.all(out.photos.map(async (p) => ({ ...p, blob: undefined, data: await blobToDataUrl(p.blob) })));
   return out;

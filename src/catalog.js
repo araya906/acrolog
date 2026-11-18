@@ -5,6 +5,7 @@
 // guide = tutorial page on the Partner Acrobatics manual (path under GUIDE_BASE).
 // video = video of the skill as listed on Acropedia (YouTube or Instagram; belongs to its creator).
 // ap    = Acropedia skill id (page under ACROPEDIA_BASE).
+// ap ids also link a flow to its entry in the Acropedia library (src/acropedia.js).
 // Levels are a rough guide for ordering; adjust them to how your community teaches.
 
 export const GUIDE_BASE = "https://partneracrobatics.com";
@@ -47,6 +48,13 @@ export const FIGURES = [
   f("bicep-stand", "Bicep stand", "Pino sobre bíceps", "lbase", 3, "bicepstand", "/inversions/handstands-on-body/handstand-on-biceps/"),
   f("hand-to-hand", "Hand to hand (L-base)", "Mano a mano (L-base)", "lbase", 4, "handtohand", "/l-basing/l-base-intermediate-advanced/hand-to-hand-2/"),
   f("reverse-hand-to-hand", "Reverse hand to hand", "Mano a mano invertido", "lbase", 4, "reversehandtohand"),
+  f("side-plank", "Side plank", "Plancha lateral", "lbase", 2, "acroyogasideplank"),
+  f("free-bird", "Free bird (no hands)", "Pájaro libre (sin manos)", "lbase", 2, "freebird"),
+  f("straddle-throne", "Straddle throne", "Trono abierto", "lbase", 2, "straddlethrone"),
+  f("thinker", "Thinker", "Pensador", "lbase", 2, "acroyogathinker"),
+  f("pigeon", "Pigeon", "Paloma", "lbase", 3, "acroyogapigeon"),
+  f("croc", "Croc", "Cocodrilo", "lbase", 3, "acrocroc"),
+  f("bow-and-arrow", "Bow and arrow", "Arco y flecha", "lbase", 3, "acroyoga"),
   // Therapeutic
   f("folded-leaf", "Folded leaf", "Hoja plegada", "therapeutic", 1, "foldedleaf"),
   f("floating-paschimo", "Floating paschimottanasana", "Paschimottanasana flotante", "therapeutic", 1, "floatingpaschimo"),
@@ -65,10 +73,14 @@ export const FIGURES = [
   f("standing-reverse-f2h", "Standing reverse foot to hand", "Pie a mano invertido de pie", "standing", 4, "reversefoottohand", "/standing-acrobatics/reverse-f2h-standing/"),
   f("handstand-on-shoulders", "Handstand on shoulders", "Pino sobre hombros", "standing", 4, "handstandonshoulders", "/standing-acrobatics/handstand-on-shoulders/"),
   f("standing-h2h", "Standing hand to hand", "Mano a mano de pie", "standing", 4, "standinghandtohand"),
+  f("shoulder-sit", "Shoulder sit", "Sentado en hombros", "standing", 1, "shouldersit"),
+  f("climb-to-shoulders", "Climb to shoulders", "Subida a hombros", "standing", 2, "acrobalance"),
+  f("cupie", "Cupie (one-hand stand)", "Cupie (de pie en una mano)", "standing", 4, "acrocupie"),
   // Trios and groups
   f("trio-back-bird", "Trio back bird (two flyers)", "Pájaro invertido en trío (dos flyers)", "trio", 2, "acroyogatrio"),
   f("trio-down-dog", "Trio down dog with hanging flyer", "Perro bocabajo en trío con flyer colgado", "trio", 2, "acroyogatrio"),
-  f("pyramid", "Pyramid", "Pirámide", "trio", 3, "acropyramid")
+  f("pyramid", "Pyramid", "Pirámide", "trio", 3, "acropyramid"),
+  f("trio-double-bird", "Double-base front bird (trio)", "Pájaro con dos bases (trío)", "trio", 2, "acroyogatrio")
 ];
 
 const fl = (id, en, es, type, level, steps, tag, extra = {}) => ({ id, kind: "flow", name: { en, es }, type, level, steps, tag, ...extra });
@@ -86,10 +98,19 @@ export const FLOWS = [
   fl("back-plank-f2h", "Back plank to foot to hand", "Plancha invertida a pie a mano", "transition", 3, ["back-plank", "foot-to-hand"], "foottohand", { guide: "/l-basing/l-base-intermediate-advanced/back-plank-foot-hand/" }),
   fl("bird-reverse-h2h", "Bird to reverse hand to hand", "Pájaro a mano a mano invertido", "transition", 4, ["front-bird", "reverse-hand-to-hand"], "reversehandtohand", { guide: "/l-basing/l-base-intermediate-advanced/bird-reverse-hand-hand/" }),
   fl("thigh-stand-h2h", "Thigh stand to hand to hand (standing)", "De muslos a mano a mano (de pie)", "transition", 4, ["thigh-stand", "standing-h2h"], "standinghandtohand", { guide: "/standing-acrobatics/thighstand-to-h2h-standing/" }),
+  fl("plank-bird", "Plank to bird", "Plancha a pájaro", "transition", 1, ["plank", "front-bird"], "acroyogatransitions"),
+  fl("bird-back-bird", "Bird to back bird", "Pájaro a pájaro invertido", "transition", 2, ["front-bird", "back-bird"], "acroyogatransitions"),
+  fl("throne-candlestick", "Throne to candlestick", "Trono a vela", "transition", 2, ["throne", "candlestick"], "acroyogatransitions"),
+  fl("whale-high-whale", "Whale to high flying whale", "Ballena a ballena voladora", "transition", 2, ["whale", "high-flying-whale"], "acroyogawhale"),
+  fl("star-reverse-star", "Star to reverse star", "Estrella a estrella invertida", "transition", 3, ["star", "reverse-star"], "reversestar"),
+  fl("shoulder-sit-two-high", "Shoulder sit to two-high", "Sentado en hombros a two-high", "transition", 4, ["shoulder-sit", "two-high"], "twohigh"),
   // Flows
   fl("first-flight", "First flight", "Primer vuelo", "flow", 1, ["plank", "front-bird", "back-bird", "folded-leaf"], "acroyogabeginner"),
   fl("therapeutic-flow", "Therapeutic flow", "Secuencia terapéutica", "flow", 1, ["folded-leaf", "floating-paschimo", "straddle-bat", "hangle-dangle"], "therapeuticflying"),
   fl("throne-family", "Throne family", "Familia del trono", "flow", 2, ["front-bird", "throne", "reverse-throne", "chair"], "acroyogathrone"),
+  fl("bird-family", "Bird family", "Familia del pájaro", "flow", 2, ["front-bird", "free-bird", "side-star", "back-bird"], "frontbird"),
+  fl("star-family", "Star family", "Familia de la estrella", "flow", 3, ["candlestick", "star", "side-star", "reverse-star"], "acroyogastar"),
+  fl("standing-warmup", "Standing warm-up", "Calentamiento de pie", "flow", 2, ["shoulder-sit", "thigh-stand", "camel"], "standingacro"),
   // Washing machines (video and page from Acropedia)
   fl("helicopter", "Helicopter", "Helicóptero", "washing", 2, [], "acroyogahelicopter", { video: "https://www.youtube.com/watch?v=x5yuJ1rUP50", ap: "helicopter", guide: "/l-basing/washing-machines/helicopter/" }),
   fl("ninja-star", "Ninja star", "Estrella ninja", "washing", 2, [], "ninjastar", { video: "https://youtu.be/xk1Vkx6Q83s", ap: "ninja-stars", guide: "/l-basing/washing-machines/ninja-star/" }),
@@ -113,7 +134,39 @@ export const FLOWS = [
   fl("back-orbit", "Back orbit", "Órbita trasera", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/KH12OiZhrUc", ap: "back-orbit" }),
   fl("nunchucks", "Nunchucks", "Nunchakus", "washing", 4, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=CEzvEITbudo", ap: "nunchucks" }),
   fl("majestic-throne", "Majestic throne", "Trono majestuoso", "washing", 4, [], "acroyogathrone", { video: "https://www.youtube.com/watch?v=-scpxte01pM", ap: "majestic-throne" }),
-  fl("high-ninja-star", "High ninja star (standing)", "Estrella ninja alta (de pie)", "washing", 4, [], "ninjastar", { video: "https://www.youtube.com/watch?v=05qGlrjsyww", ap: "high-ninja-star" })
+  fl("high-ninja-star", "High ninja star (standing)", "Estrella ninja alta (de pie)", "washing", 4, [], "ninjastar", { video: "https://www.youtube.com/watch?v=05qGlrjsyww", ap: "high-ninja-star" }),
+  // More washing machines from Acropedia (heads of the larger families and well-known classics)
+  fl("perfect-storms", "Perfect storms", "Tormentas perfectas", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/mp6Nhe-33gI", ap: "perfect-storms" }),
+  fl("doublefly-flow", "Doublefly flow", "Doublefly flow", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/9pKJY-s69es", ap: "doublefly-flow" }),
+  fl("swimming-mermaid", "Swimming mermaid", "Sirena nadadora", "washing", 3, [], "acroyogamermaid", { video: "https://www.youtube.com/watch?v=5sVWIPe8F0A", ap: "swimming-mermaid" }),
+  fl("topsy-turvy", "Topsy turvy", "Patas arriba", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=qCNN1vOeRS0", ap: "topsy-turvy-3" }),
+  fl("russian-braid", "Russian braid", "Trenza rusa", "washing", 4, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=ZyFqoI31NGs", ap: "russian-braid" }),
+  fl("temple-spin", "Temple spin", "Giro del templo", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=0FIZ1D-dYdk", ap: "temple-spin" }),
+  fl("spider-rolls", "Spider rolls", "Rodadas araña", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/mxQWgMl8ZiM", ap: "spider-rolls" }),
+  fl("piston", "Piston", "Pistón", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=nJ-LtE0NOgw", ap: "piston" }),
+  fl("star-abaho", "Star Abaho", "Star Abaho", "washing", 3, [], "acroyogastar", { video: "https://youtu.be/le6QqNudhM4", ap: "star-abaho-1" }),
+  fl("twisted-tornado", "Twisted tornado", "Tornado retorcido", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/JaMDksmZ5m8", ap: "twisted-tornado" }),
+  fl("merry-go-rounds", "Merry-go-rounds", "Tiovivo", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/8ixufOp2P_M", ap: "merry-go-rounds" }),
+  fl("crochet-hooks-inside-star", "Crochet hooks (inside star)", "Ganchillo (estrella interior)", "washing", 3, [], "acroyogastar", { video: "https://youtu.be/rQjmXBWMTwI", ap: "crochet-hooks-inside-star" }),
+  fl("moonies-back", "Moonies (back)", "Moonies (de espalda)", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/fBU7BXpmzo8", ap: "moonies-back" }),
+  fl("musical-chairs", "Musical chairs", "Sillas musicales", "washing", 3, [], "acroyogathrone", { video: "https://www.youtube.com/watch?v=95Z0FAPIZGg", ap: "musical-chairs" }),
+  fl("propeller", "Propeller", "Hélice", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=ZOzawRVdj1w", ap: "propeller" }),
+  fl("spiral", "Spiral", "Espiral", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=ZIyI555tGfo", ap: "spiral" }),
+  fl("angry-birds", "Angry birds", "Angry birds", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=hwiKouIMWhk", ap: "angry-birds" }),
+  fl("carousel", "Carousel", "Carrusel", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=0zbGnUwWu8I", ap: "carousel" }),
+  fl("leap-frog", "Leap frog", "Pídola", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/fcUkTS63rcw", ap: "leap-frog" }),
+  fl("somersault", "Somersault", "Voltereta", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=IhqUPYA2J7k", ap: "somersault" }),
+  fl("eagle-roll", "Eagle roll", "Rodada del águila", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=q5YJBZZhoGo", ap: "eagle-roll" }),
+  fl("music-box", "Music box", "Caja de música", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=6e9BwNVxSzg", ap: "music-box" }),
+  fl("whip-prep", "Whip prep", "Preparación del látigo", "washing", 3, [], "acroyogawhip", { video: "https://www.youtube.com/watch?v=whC19SdcUvg", ap: "whip-prep" }),
+  fl("popping-barrel-rolls", "Popping barrel rolls", "Barriles con pop", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/6uRJVxmhL8Y", ap: "popping-barrel-rolls" }),
+  fl("swimming-side-stars", "Swimming side stars", "Estrellas laterales nadando", "washing", 3, [], "sidestar", { video: "https://youtu.be/Ev1-ItnkU9M", ap: "swimming-side-stars" }),
+  fl("starfish-roll", "Starfish roll", "Rodada estrella de mar", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=alAsPIBq2qM", ap: "starfish-roll" }),
+  fl("rotisseries", "Rotisseries", "Rostizador", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/vPTh_dUi8VE", ap: "rotisseries" }),
+  fl("pizza-flipper", "Pizza flipper", "Volteador de pizza", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=y4_8Fcc-WAI", ap: "pizza-flipper" }),
+  fl("ninja-copter", "Ninja copter", "Ninja copter", "washing", 3, [], "acroyogahelicopter", { video: "https://youtu.be/E8mhA3IWJHM", ap: "ninja-copter" }),
+  fl("shoulderang", "Shoulderang", "Shoulderang", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/wRuzYvVf1JI", ap: "shoulderang" }),
+  fl("waltz", "Waltz", "Vals", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=2bG9JV9Dwzg", ap: "waltz" })
 ];
 
 export const SEED = [...FIGURES, ...FLOWS];

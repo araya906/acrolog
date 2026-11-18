@@ -182,5 +182,55 @@ export const PHOTOS = {
                               "licenseUrl":  "https://creativecommons.org/licenses/by-sa/4.0",
                               "page":  "https://commons.wikimedia.org/wiki/File:Three_Person_Foot_to_Foot_Downward_Dog_with_Foot_Hang_Flyer_-_Acroyoga_Pose.jpg"
                           }
-                      ]
+                      ],
+    "plank":  [
+                  {
+                      "src":  "img/photos/plank-1.jpg",
+                      "title":  "Acroyoga in butler park.jpg",
+                      "author":  "charliellewellin",
+                      "license":  "CC BY-SA 2.0",
+                      "licenseUrl":  "https://creativecommons.org/licenses/by-sa/2.0",
+                      "page":  "https://commons.wikimedia.org/wiki/File:Acroyoga_in_butler_park.jpg"
+                  }
+              ],
+    "back-bird":  [
+                      {
+                          "src":  "img/photos/back-bird-1.jpg",
+                          "title":  "AcroYoga pose Back Bird variation.jpg",
+                          "author":  "Earl McGehee",
+                          "license":  "CC BY-SA 3.0",
+                          "licenseUrl":  "https://creativecommons.org/licenses/by-sa/3.0",
+                          "page":  "https://commons.wikimedia.org/wiki/File:AcroYoga_pose_Back_Bird_variation.jpg"
+                      }
+                  ],
+    "hand-to-hand":  [
+                         {
+                             "src":  "img/photos/hand-to-hand-1.jpg",
+                             "title":  "Acro yoga.jpg",
+                             "author":  "Hannah Pepper",
+                             "license":  "CC BY-SA 4.0",
+                             "licenseUrl":  "https://creativecommons.org/licenses/by-sa/4.0",
+                             "page":  "https://commons.wikimedia.org/wiki/File:Acro_yoga.jpg"
+                         }
+                     ],
+    "bow-and-arrow":  [
+                          {
+                              "src":  "img/photos/bow-and-arrow-1.jpg",
+                              "title":  "Acroyoga-Bow\u0026arrow.jpg",
+                              "author":  "Thebh2005",
+                              "license":  "CC BY-SA 4.0",
+                              "licenseUrl":  "https://creativecommons.org/licenses/by-sa/4.0",
+                              "page":  "https://commons.wikimedia.org/wiki/File:Acroyoga-Bow%26arrow.jpg"
+                          }
+                      ],
+    "thinker":  [
+                    {
+                        "src":  "img/photos/thinker-1.jpg",
+                        "title":  "YogaBeyond ACROVINYASA.jpg",
+                        "author":  "Universe333",
+                        "license":  "CC BY-SA 4.0",
+                        "licenseUrl":  "https://creativecommons.org/licenses/by-sa/4.0",
+                        "page":  "https://commons.wikimedia.org/wiki/File:YogaBeyond_ACROVINYASA.jpg"
+                    }
+                ]
 };

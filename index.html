@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1d2b3a">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; media-src 'none'; object-src 'none'; frame-src https://www.instagram.com https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://i.ytimg.com; connect-src 'self'; font-src 'self'; media-src 'none'; object-src 'none'; frame-src https://www.instagram.com https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
   <title>AcroLog</title>
   <meta name="description" content="Track your acroyoga progress: figures, flows and practice sessions, with Instagram references. No accounts: your data stays on your phone.">
   <link rel="manifest" href="manifest.webmanifest">
@@ -38,9 +38,10 @@
       <div id="flow-list"></div>
       <button type="button" class="btn wide" data-act="new-flow" data-i18n="new_flow"></button>
       <div class="card mt">
-        <h2 data-i18n="more_wm_title"></h2>
-        <p class="hint" data-i18n="more_wm_text"></p>
-        <a class="btn wide" id="acropedia-all" target="_blank" rel="noopener noreferrer" data-i18n="more_wm_btn"></a>
+        <h2 data-i18n="lib_title"></h2>
+        <p class="hint" data-i18n="lib_text"></p>
+        <button type="button" class="btn primary wide" data-act="library" data-i18n="lib_btn"></button>
+        <p class="hint mt"><a id="acropedia-all" target="_blank" rel="noopener noreferrer" data-i18n="more_wm_btn"></a></p>
       </div>
     </section>
 
@@ -82,7 +83,20 @@
       <div class="card"><h2 data-i18n="partners_title"></h2><div id="partners"></div></div>
     </section>
 
-    <!-- 5. Settings & data -->
+    <!-- 5. Friends (sharing without a server) -->
+    <section id="tab-friends" class="tab" data-tab="friends" hidden>
+      <div class="card" id="me-card"></div>
+      <div class="card">
+        <h2 data-i18n="friends_title"></h2>
+        <div class="items" id="friends"></div>
+        <div class="inline mt"><input id="friend-link" type="url" inputmode="url" autocomplete="off" data-i18n-ph="friend_link_ph">
+          <button type="button" class="btn small" data-act="friend-paste" data-i18n="add"></button></div>
+        <p class="hint" data-i18n="friends_how"></p>
+      </div>
+      <div class="card"><h2 data-i18n="log_partners_title"></h2><p class="hint" data-i18n="log_partners_hint"></p><div class="items" id="log-partners"></div></div>
+    </section>
+
+    <!-- 6. Settings & data -->
     <section id="tab-data" class="tab" data-tab="data" hidden>
       <button type="button" class="btn primary wide" id="install" data-act="install" hidden data-i18n="install_btn"></button>
       <div class="card">
@@ -93,6 +107,11 @@
           <label><input type="radio" name="roles" value="flyer"><span data-i18n="role_flyer"></span></label>
         </div>
         <p class="hint" data-i18n="roles_hint"></p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="thumbs_title"></h2>
+        <label class="check"><input type="checkbox" id="thumbs"><span data-i18n="thumbs_label"></span></label>
+        <p class="hint" data-i18n="thumbs_hint"></p>
       </div>
       <div class="card">
         <h2 data-i18n="ig_title"></h2>
@@ -127,6 +146,7 @@
     <button data-goto="flows"><svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M18 8l-5 8M6 8l5 8"/></svg><span data-i18n="tab_flows"></span></button>
     <button data-goto="log"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg><span data-i18n="tab_log"></span></button>
     <button data-goto="progress"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="tab_progress"></span></button>
+    <button data-goto="friends"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.5 2.7-6 6-6s6 2.5 6 6M14 14.5c.9-.4 1.9-.5 3-.5 2.8 0 5 2 5 5"/></svg><span data-i18n="tab_friends"></span></button>
     <button data-goto="data"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span data-i18n="tab_data"></span></button>
   </nav>
 

@@ -1,6 +1,6 @@
 // Offline app shell. Only same-origin files are cached; Instagram links and previews pass straight through.
 // Bump VERSION whenever a file in SHELL changes.
-const VERSION = "al-2026-11-18-3";
+const VERSION = "al-2026-11-18-5";
 const SHELL = [
   "./",
   "index.html",
@@ -12,6 +12,8 @@ const SHELL = [
   "src/photos.js",
   "src/media.js",
   "src/store.js",
+  "src/social.js",
+  "src/acropedia.js",
   "src/i18n.js",
   "src/lang/en.js",
   "src/lang/es.js",
@@ -38,6 +40,11 @@ const SHELL = [
   "img/photos/handstand-on-thighs-1.jpg",
   "img/photos/trio-back-bird-1.jpg",
   "img/photos/trio-down-dog-1.jpg",
+  "img/photos/plank-1.jpg",
+  "img/photos/back-bird-1.jpg",
+  "img/photos/hand-to-hand-1.jpg",
+  "img/photos/bow-and-arrow-1.jpg",
+  "img/photos/thinker-1.jpg",
   // PHOTOS:END
 ];
 
