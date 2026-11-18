@@ -738,6 +738,21 @@ async function onClick(e) {
       renderAll();
       return toast(t("deleted_all"));
     }
+    case "check-update": {
+      // The only request the app makes on its own initiative, and only on this tap: fetch sw.js and compare.
+      const reg = await navigator.serviceWorker?.getRegistration();
+      if (!reg) return toast(t("update_none"));
+      try {
+        await reg.update();
+      } catch {
+        return toast(t("update_offline"));
+      }
+      if (reg.installing || reg.waiting) {
+        toast(t("update_found"));
+        navigator.serviceWorker.addEventListener("controllerchange", () => location.reload(), { once: true });
+      } else toast(t("update_latest"));
+      return;
+    }
     case "install": {
       if (!S.install) return;
       S.install.prompt();

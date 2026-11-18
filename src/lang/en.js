@@ -152,12 +152,20 @@ export default {
   privacy_title: "Privacy",
   privacy_points: [
     "No accounts, no tracking, no ads.",
-    "Your progress, sessions and links stay in this browser on this device.",
+    "Your progress, sessions, links and photos stay in this browser on this device and are never sent anywhere.",
+    "Once installed, the app opens from your phone and makes no internet requests by itself. Internet is used only when you tap a link, Play / Preview a video, or Check for updates.",
     "Uninstalling the app or clearing site data deletes them: keep a backup."
   ],
   delete_all: "Delete all my data",
   delete_all_confirm: "Delete all progress, sessions, links and custom figures from this device? This cannot be undone.",
   deleted_all: "All data deleted",
+  update_title: "Updates",
+  update_hint: "The app works fully offline and does not check for new versions by itself.",
+  update_btn: "Check for updates",
+  update_found: "New version found, reloading…",
+  update_latest: "You have the latest version.",
+  update_offline: "No connection. Try again when you are online.",
+  update_none: "Install the app first (or open it once online).",
   install_btn: "Install app",
   install_hint: "Works offline once installed."
 };

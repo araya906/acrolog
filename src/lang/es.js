@@ -152,12 +152,20 @@ export default {
   privacy_title: "Privacidad",
   privacy_points: [
     "Sin cuentas, sin seguimiento, sin anuncios.",
-    "Tu progreso, sesiones y enlaces se quedan en este navegador y este dispositivo.",
+    "Tu progreso, sesiones, enlaces y fotos se quedan en este navegador y este dispositivo y nunca se envían a ningún sitio.",
+    "Una vez instalada, la app se abre desde tu móvil y no hace ninguna petición a internet por sí sola. Solo se usa internet al pulsar un enlace, Ver / Vista previa de un vídeo o Buscar actualizaciones.",
     "Desinstalar la app o borrar los datos del sitio los elimina: guarda una copia."
   ],
   delete_all: "Borrar todos mis datos",
   delete_all_confirm: "¿Borrar de este dispositivo todo el progreso, sesiones, enlaces y figuras propias? No se puede deshacer.",
   deleted_all: "Datos borrados",
+  update_title: "Actualizaciones",
+  update_hint: "La app funciona sin conexión y no busca nuevas versiones por sí sola.",
+  update_btn: "Buscar actualizaciones",
+  update_found: "Nueva versión encontrada, recargando…",
+  update_latest: "Tienes la última versión.",
+  update_offline: "Sin conexión. Inténtalo cuando estés en línea.",
+  update_none: "Instala la app primero (o ábrela una vez con conexión).",
   install_btn: "Instalar app",
   install_hint: "Funciona sin conexión una vez instalada."
 };
