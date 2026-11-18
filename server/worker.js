@@ -1,15 +1,16 @@
 // AcroLog sync: a tiny mailbox of progress snapshots, one per person. No accounts, no emails, no passwords.
 //
-//   PUT    /v1/snap/:id   body = snapshot JSON, header Authorization: Bearer <key>
-//                          The first write for an id stores a hash of its key; later writes must use the same key.
-//   GET    /v1/snaps?ids=a,b,c   → { snaps: { id: snapshot } } for the ids that exist (max 100)
-//   DELETE /v1/snap/:id   header Authorization: Bearer <key>  → removes it (turning sync off, "Delete all my data")
+//   PUT    /v1/snap/:sid  body = snapshot JSON, header Authorization: Bearer <key>
+//   GET    /v1/snaps?ids=a,b,c   → { snaps: { sid: snapshot } } for the sync ids that exist (max 100)
+//   DELETE /v1/snap/:sid  header Authorization: Bearer <key>  → removes it (turning sync off, "Delete all my data")
 //   GET    /             → { ok: true } (the app's connection check)
 //
-// Ids are random UUIDs generated on the phone; a snapshot can be read only by someone who has the id,
-// which travels inside the friend link. The snapshot is the same data the share link already carries.
+// The sync id is derived from the secret key: sid = first 32 hex chars of sha256(key). The server checks that on
+// every write, so nobody can write under a sid without its key (not even a friend who knows the sid from your link).
+// A snapshot can be read only by someone who has the sid, which travels inside the friend link.
+// The snapshot is the same data the share link already carries.
 
-const ID_RE = /^[\w-]{8,80}$/;
+const ID_RE = /^[0-9a-f]{32}$/;
 const MAX_BODY = 64 * 1024;
 const MIN_INTERVAL_MS = 10 * 1000; // one upload per person every 10 s at most
 
@@ -47,7 +48,8 @@ async function route(req, env) {
     if (!ID_RE.test(id)) return json({ error: "bad_id" }, 400);
     const key = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     if (key.length < 20 || key.length > 200) return json({ error: "no_key" }, 401);
-    const hash = await sha256(id + ":" + key);
+    const hash = await sha256(key);
+    if (hash.slice(0, 32) !== id) return json({ error: "forbidden" }, 403);
 
     if (req.method === "PUT") {
       const len = Number(req.headers.get("Content-Length") || 0);
@@ -56,7 +58,7 @@ async function route(req, env) {
       if (text.length > MAX_BODY) return json({ error: "too_big" }, 413);
       let snap;
       try { snap = JSON.parse(text); } catch { return json({ error: "bad_json" }, 400); }
-      if (!snap || snap.a !== "acrolog" || snap.v !== 1 || snap.id !== id || isNaN(new Date(snap.at))) return json({ error: "bad_snap" }, 400);
+      if (!snap || snap.a !== "acrolog" || snap.v !== 1 || snap.sy !== id || isNaN(new Date(snap.at))) return json({ error: "bad_snap" }, 400);
 
       const row = await env.DB.prepare("SELECT key_hash, updated FROM snaps WHERE id = ?").bind(id).first();
       if (row && row.key_hash !== hash) return json({ error: "forbidden" }, 403);

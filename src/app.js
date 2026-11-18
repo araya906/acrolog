@@ -5,7 +5,7 @@ import { videoInfo, platformName, shrinkImage } from "./media.js";
 import { all, put, remove, clearAll, exportAll, importAll, getSetting, setSetting } from "./store.js";
 import { today, weekly, streakWeeks, totals, practice, statusOf, statusCounts, suggestions, findUrl, igInfo, tagUrl } from "./stats.js";
 import { SNAP_KEY, encodeSnap, decodeSnap, snapFromText, buildSnap, validateSnap, together, compare, sameName } from "./social.js";
-import { syncConfigured, pushSnap, pullSnaps, deleteSnap, newKey } from "./sync.js";
+import { syncConfigured, pushSnap, pullSnaps, deleteSnap, newKey, sidFor } from "./sync.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -436,7 +436,7 @@ function myNames() {
 }
 
 const mySnap = () => buildSnap({
-  me: S.me, roles: S.roles, progress: S.progress, sessions: S.sessions, names: myNames(),
+  me: { ...S.me, sync: syncOn() }, roles: S.roles, progress: S.progress, sessions: S.sessions, names: myNames(),
   stats: { sessions: S.sessions.length, minutes: totals(S.sessions).minutes, streak: streakWeeks(S.sessions) },
   includeSessions: getSetting("shareSessions", true)
 });
@@ -446,7 +446,7 @@ const myLink = async () => `${location.origin}${location.pathname}#${SNAP_KEY}${
 // ---------- automatic sync (optional; server/worker.js) ----------
 // Upload: a few seconds after a change, and when the app goes to the background. Download: when the app
 // opens, comes back online, or you open Friends (at most every 2 minutes unless you tap Refresh).
-const syncOn = () => S.sync && syncConfigured() && S.me?.id && S.me?.key;
+const syncOn = () => !!(S.sync && syncConfigured() && S.me?.id && S.me?.key && S.me?.sid);
 const SYNC_DELAY = 8000;
 let pushTimer = null, lastPull = 0, syncing = false;
 
@@ -472,21 +472,27 @@ async function pushMine() {
 }
 
 async function pullFriends(force = false) {
-  if (!syncOn() || !S.friends.length || syncing || !navigator.onLine) return;
+  // Only friends whose last link carried a sync id (they had sync on) can be fetched.
+  const syncing_ = S.friends.filter((f) => f.sy);
+  if (!syncOn() || !syncing_.length || syncing || !navigator.onLine) {
+    if (force && syncOn() && !syncing_.length) toast(t("sync_no_friends"));
+    return;
+  }
   if (!force && Date.now() - lastPull < 120000) return;
   syncing = true;
   lastPull = Date.now();
   try {
-    const got = await pullSnaps(S.friends.map((f) => f.id));
+    const got = await pullSnaps(syncing_.map((f) => f.sy));
     const updated = [];
-    for (const [id, raw] of Object.entries(got)) {
+    for (const [sid, raw] of Object.entries(got)) {
       let snap;
       try { snap = validateSnap(raw); } catch { continue; }
-      const old = S.friends.find((f) => f.id === id);
-      if (!old || snap.id !== id || snap.at <= old.at) continue;
-      const rec = { ...snap, alias: old.alias, received: new Date().toISOString() };
+      const old = S.friends.find((f) => f.sy === sid);
+      // The snapshot must belong to the same person (profile id) and be newer.
+      if (!old || snap.id !== old.id || snap.at <= old.at) continue;
+      const rec = { ...snap, sy: snap.sy || sid, alias: old.alias, received: new Date().toISOString() };
       await put("friends", rec);
-      S.friends = [rec, ...S.friends.filter((f) => f.id !== id)];
+      S.friends = [rec, ...S.friends.filter((f) => f.id !== old.id)];
       updated.push(snap.name);
     }
     S.friends.sort((a, b) => (b.at || "").localeCompare(a.at || ""));
@@ -509,7 +515,8 @@ async function pullFriends(force = false) {
 async function setSync(on) {
   if (on) {
     if (!S.me?.name) return toast(t("me_needed"));
-    S.me = { ...S.me, key: S.me.key || newKey() };
+    const key = S.me.key || newKey();
+    S.me = { ...S.me, key, sid: await sidFor(key) };
     setSetting("me", S.me);
     S.sync = true;
     setSetting("sync", true);
@@ -520,7 +527,7 @@ async function setSync(on) {
     setSetting("sync", false);
     clearTimeout(pushTimer);
     try {
-      if (S.me?.key && syncConfigured()) await deleteSnap(S.me.id, S.me.key);
+      if (S.me?.sid && syncConfigured()) await deleteSnap(S.me.sid, S.me.key);
       toast(t("sync_off_done"));
     } catch {
       toast(t("sync_off_offline"));
@@ -1234,9 +1241,9 @@ async function onClick(e) {
     }
     case "delete-all": {
       if (!confirm(t("delete_all_confirm"))) return;
-      if (S.me?.key && syncConfigured()) {
+      if (S.me?.sid && syncConfigured()) {
         clearTimeout(pushTimer);
-        try { await deleteSnap(S.me.id, S.me.key); } catch { toast(t("sync_off_offline")); }
+        try { await deleteSnap(S.me.sid, S.me.key); } catch { toast(t("sync_off_offline")); }
       }
       await clearAll();
       S.me = null;
@@ -1323,9 +1330,9 @@ async function onChange(e) {
       const n = await importAll(data);
       const me = data.me;
       if (me && typeof me.id === "string" && typeof me.name === "string") {
-        S.me = { id: me.id.slice(0, 80), name: me.name.slice(0, 40), note: String(me.note || "").slice(0, 120), ...(typeof me.key === "string" && { key: me.key }) };
+        S.me = { id: me.id.slice(0, 80), name: me.name.slice(0, 40), note: String(me.note || "").slice(0, 120), ...(typeof me.key === "string" && { key: me.key }), ...(/^[0-9a-f]{32}$/.test(me.sid || "") && { sid: me.sid }) };
         setSetting("me", S.me);
-        S.sync = !!data.sync && !!S.me.key;
+        S.sync = !!data.sync && !!S.me.key && !!S.me.sid;
         setSetting("sync", S.sync);
       }
       await load();

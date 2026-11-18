@@ -13,6 +13,12 @@ export function newKey() {
   return btoa(String.fromCharCode(...b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+// Sync id = first 32 hex chars of sha256(key). The server checks it, so only the key's owner can write there.
+export async function sidFor(key) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
+}
+
 async function call(path, opts = {}) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 12000);
@@ -26,7 +32,7 @@ async function call(path, opts = {}) {
   }
 }
 
-export const pushSnap = (snap, key) => call(`/v1/snap/${encodeURIComponent(snap.id)}`, {
+export const pushSnap = (snap, key) => call(`/v1/snap/${encodeURIComponent(snap.sy)}`, {
   method: "PUT", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(snap)
 });
 
@@ -39,4 +45,4 @@ export async function pullSnaps(ids) {
   return out;
 }
 
-export const deleteSnap = (id, key) => call(`/v1/snap/${encodeURIComponent(id)}`, { method: "DELETE", headers: { Authorization: `Bearer ${key}` } });
+export const deleteSnap = (sid, key) => call(`/v1/snap/${encodeURIComponent(sid)}`, { method: "DELETE", headers: { Authorization: `Bearer ${key}` } });

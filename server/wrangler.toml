@@ -12,4 +12,4 @@ ALLOWED_ORIGINS = "*"
 binding = "DB"
 database_name = "acrolog"
 # Paste the id printed by `npx wrangler d1 create acrolog` here.
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "9f0c44e0-92ae-4ea0-8ae5-820b2e9ce088"

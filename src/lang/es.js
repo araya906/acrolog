@@ -244,7 +244,8 @@ export default {
   friends_on_item: "Amigos:",
   // Sincronización automática
   sync_label: "Mantener a mis amigos al día automáticamente",
-  sync_hint: "Sube tu resumen (los mismos datos que tu enlace) al servidor de sincronización de AcroLog unos segundos después de cada cambio, y descarga el último progreso de tus amigos al abrir la app. Tus amigos también deben activarlo. Al desactivarlo se borra tu copia del servidor.",
+  sync_hint: "Sube tu resumen (los mismos datos que tu enlace) al servidor de sincronización de AcroLog unos segundos después de cada cambio, y descarga el último progreso de tus amigos al abrir la app. Tus amigos también deben activarlo. Después de activarlo, envía tu enlace una vez más: así las apps de tus amigos saben dónde encontrar tus novedades. Al desactivarlo se borra tu copia del servidor.",
+  sync_no_friends: "Ninguno de tus amigos tiene la sincronización activada. Pídeles que la activen y te vuelvan a mandar su enlace.",
   sync_status: "Subido {a} · amigos comprobados {b}",
   sync_refresh: "Sincronizar ahora",
   sync_err: "No se pudo conectar con el servidor de sincronización. Lo reintentará la próxima vez que tengas conexión.",

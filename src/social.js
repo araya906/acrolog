@@ -72,6 +72,7 @@ export function validateSnap(o) {
     id: o.id,
     name: str(o.n, 40) || "?",
     note: str(o.b, 120),
+    sy: /^[0-9a-f]{32}$/.test(o.sy || "") ? o.sy : "", // sync id when they turned on automatic sync
     roles: roles.length ? roles : ["base", "flyer"],
     at: at.toISOString(),
     stats: { sessions: num(o.s?.c, 1e6), minutes: num(o.s?.m, 1e8), streak: num(o.s?.w, 1e4) },
@@ -88,7 +89,7 @@ export function buildSnap({ me, roles, progress, sessions, stats, names, include
     if (b || f || pr.fav) p.push(`${pr.id}:${b}${f}${pr.fav ? "*" : ""}`);
   }
   const snap = {
-    a: "acrolog", v: 1, id: me.id, n: str(me.name, 40), b: str(me.note, 120) || undefined,
+    a: "acrolog", v: 1, id: me.id, n: str(me.name, 40), b: str(me.note, 120) || undefined, sy: me.sync && me.sid ? me.sid : undefined,
     r: (roles.includes("base") ? "b" : "") + (roles.includes("flyer") ? "f" : ""),
     at: new Date().toISOString(),
     s: { c: stats.sessions, m: stats.minutes, w: stats.streak },

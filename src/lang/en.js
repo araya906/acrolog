@@ -244,7 +244,8 @@ export default {
   friends_on_item: "Friends:",
   // Automatic sync
   sync_label: "Keep friends updated automatically",
-  sync_hint: "Uploads your snapshot (the same data as your link) to the AcroLog sync server a few seconds after each change, and downloads your friends' latest progress when you open the app. Friends need it on too. Turning it off deletes your copy from the server.",
+  sync_hint: "Uploads your snapshot (the same data as your link) to the AcroLog sync server a few seconds after each change, and downloads your friends' latest progress when you open the app. Friends need it on too. After turning it on, send your link once more: it tells your friends' apps where to find your updates. Turning it off deletes your copy from the server.",
+  sync_no_friends: "None of your friends has sync on yet. Ask them to turn it on and send you their link again.",
   sync_status: "Uploaded {a} · checked friends {b}",
   sync_refresh: "Sync now",
   sync_err: "Could not reach the sync server. It will retry next time you are online.",
