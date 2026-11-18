@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#1d2b3a"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+    <!-- base lying down, legs up -->
+    <path d="M10 52h18M28 52l4-14" stroke="#f2efe8"/>
+    <circle cx="8" cy="50" r="3.2" fill="#f2efe8" stroke="none"/>
+    <!-- flyer in bird on the base's feet -->
+    <path d="M18 30l14 4 14-6" stroke="#f08a62"/>
+    <path d="M30 34l-6-10M34 34l6-10" stroke="#f08a62"/>
+  </g>
+  <circle cx="50" cy="26" r="3.6" fill="#f08a62"/>
+</svg>

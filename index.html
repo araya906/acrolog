@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d2b3a">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; media-src 'none'; object-src 'none'; frame-src https://www.instagram.com https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+  <title>AcroLog</title>
+  <meta name="description" content="Track your acroyoga progress: figures, flows and practice sessions, with Instagram references. No accounts: your data stays on your phone.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="top">
+    <img src="img/icon.svg" alt="" width="32" height="32">
+    <div class="titles"><h1 data-i18n="app_title">AcroLog</h1><p data-i18n="app_sub"></p></div>
+    <select id="lang" aria-label="Idioma / Language"></select>
+  </header>
+
+  <main>
+    <!-- 1. Figures -->
+    <section id="tab-figures" class="tab" data-tab="figures">
+      <div class="card inbox" id="inbox" hidden></div>
+      <input id="fig-q" type="search" autocomplete="off" data-i18n-ph="search_ph">
+      <div class="filters" id="fig-cats"></div>
+      <div class="filters" id="fig-status"></div>
+      <div id="fig-list"></div>
+      <button type="button" class="btn wide" data-act="new-fig" data-i18n="new_fig"></button>
+    </section>
+
+    <!-- 2. Flows -->
+    <section id="tab-flows" class="tab" data-tab="flows" hidden>
+      <p class="hint" data-i18n="flows_intro"></p>
+      <div class="filters" id="flow-types"></div>
+      <div id="flow-list"></div>
+      <button type="button" class="btn wide" data-act="new-flow" data-i18n="new_flow"></button>
+      <div class="card mt">
+        <h2 data-i18n="more_wm_title"></h2>
+        <p class="hint" data-i18n="more_wm_text"></p>
+        <a class="btn wide" id="acropedia-all" target="_blank" rel="noopener noreferrer" data-i18n="more_wm_btn"></a>
+      </div>
+    </section>
+
+    <!-- 3. Log -->
+    <section id="tab-log" class="tab" data-tab="log" hidden>
+      <form id="session-form" class="card" novalidate>
+        <h2 id="s-title"></h2>
+        <div class="grid2">
+          <label><span data-i18n="date"></span><input type="date" id="s-date"></label>
+          <label><span data-i18n="minutes"></span><input type="number" id="s-min" min="0" step="5" inputmode="numeric"></label>
+        </div>
+        <label><span data-i18n="partners"></span><input id="s-partners" list="partners-dl" autocomplete="off" data-i18n-ph="partners_ph"></label>
+        <datalist id="partners-dl"></datalist>
+        <fieldset>
+          <legend data-i18n="practiced"></legend>
+          <div class="row" id="s-items"></div>
+          <div class="inline mt"><select id="s-pick" aria-label="+"></select>
+            <button type="button" class="btn small" data-act="s-add" data-i18n="add"></button></div>
+          <p class="hint" data-i18n="quick_add"></p>
+          <div class="row" id="s-suggest"></div>
+        </fieldset>
+        <fieldset><legend data-i18n="how_went"></legend><div class="seg5" id="s-mood"></div></fieldset>
+        <label><span data-i18n="notes"></span><textarea id="s-notes" rows="3" data-i18n-ph="session_notes_ph"></textarea></label>
+        <button type="submit" class="btn primary wide" data-i18n="save_session"></button>
+        <button type="button" class="btn ghost wide mt" id="s-cancel" data-act="s-cancel" data-i18n="cancel" hidden></button>
+      </form>
+      <h2 data-i18n="history"></h2>
+      <div id="sessions"></div>
+    </section>
+
+    <!-- 4. Progress -->
+    <section id="tab-progress" class="tab" data-tab="progress" hidden>
+      <p class="alert warn" id="progress-empty" data-i18n="progress_empty"></p>
+      <div class="kpis" id="kpis"></div>
+      <div class="card"><h2 data-i18n="weekly_title"></h2><div id="weekly"></div></div>
+      <div class="card"><h2 data-i18n="next_title"></h2><div class="items" id="next"></div></div>
+      <div class="card"><h2 data-i18n="dist_title"></h2><div id="dist"></div></div>
+      <div class="card"><h2 data-i18n="levels_title"></h2><p class="hint" data-i18n="levels_hint"></p><div id="levels"></div></div>
+      <div class="card"><h2 data-i18n="partners_title"></h2><div id="partners"></div></div>
+    </section>
+
+    <!-- 5. Settings & data -->
+    <section id="tab-data" class="tab" data-tab="data" hidden>
+      <button type="button" class="btn primary wide" id="install" data-act="install" hidden data-i18n="install_btn"></button>
+      <div class="card">
+        <h2 data-i18n="roles_title"></h2>
+        <div class="choices">
+          <label><input type="radio" name="roles" value="both"><span data-i18n="roles_both"></span></label>
+          <label><input type="radio" name="roles" value="base"><span data-i18n="role_base"></span></label>
+          <label><input type="radio" name="roles" value="flyer"><span data-i18n="role_flyer"></span></label>
+        </div>
+        <p class="hint" data-i18n="roles_hint"></p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="ig_title"></h2>
+        <ol data-i18n-list="ig_steps"></ol>
+        <p class="hint" data-i18n="ig_privacy"></p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="backup_title"></h2>
+        <p class="hint" data-i18n="backup_hint"></p>
+        <div class="row">
+          <button type="button" class="btn" data-act="export" data-i18n="export"></button>
+          <label class="btn file"><span data-i18n="import"></span><input type="file" id="import" accept="application/json,.json"></label>
+        </div>
+        <button type="button" class="btn ghost wide mt" id="restore-hidden" data-act="restore-hidden" hidden></button>
+      </div>
+      <div class="card">
+        <h2 data-i18n="privacy_title"></h2>
+        <ul data-i18n-list="privacy_points"></ul>
+        <button type="button" class="btn danger wide" data-act="delete-all" data-i18n="delete_all"></button>
+      </div>
+      <p class="hint" data-i18n="install_hint"></p>
+    </section>
+  </main>
+
+  <nav class="tabs" id="tabs">
+    <button data-goto="figures"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M7 10l5-1 5 1M9 21l3-7 3 7"/></svg><span data-i18n="tab_figures"></span></button>
+    <button data-goto="flows"><svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M18 8l-5 8M6 8l5 8"/></svg><span data-i18n="tab_flows"></span></button>
+    <button data-goto="log"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg><span data-i18n="tab_log"></span></button>
+    <button data-goto="progress"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="tab_progress"></span></button>
+    <button data-goto="data"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span data-i18n="tab_data"></span></button>
+  </nav>
+
+  <div class="modal" id="sheet" role="dialog" aria-modal="true" hidden>
+    <div class="sheet" id="sheet-body"></div>
+  </div>
+  <div class="zoom" id="zoom" data-act="zoom-close" hidden><img alt=""></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
