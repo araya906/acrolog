@@ -170,3 +170,39 @@ export const FLOWS = [
 ];
 
 export const SEED = [...FIGURES, ...FLOWS];
+
+// Basque (euskara) names. Entries without one show the English name (most washing machines keep their
+// original name in every language).
+const EU = {
+  "plank": "Ohola", "back-plank": "Alderantzizko ohola", "front-bird": "Txoria", "back-bird": "Alderantzizko txoria",
+  "throne": "Tronua", "chair": "Aulkia", "secretary": "Idazkaria", "reverse-throne": "Alderantzizko tronua",
+  "tuck-sit": "Tuck sit / L-sit", "whale": "Balea", "high-flying-whale": "Balea hegalaria", "bow": "Arkua",
+  "candlestick": "Kandela", "star": "Izarra", "side-star": "Alboko izarra", "square-box": "Kutxa karratua",
+  "reverse-star": "Alderantzizko izarra", "vishnus-couch": "Vishnuren sofa", "mermaid": "Sirena",
+  "free-shoulder-stand": "Sorbalden gaineko oreka librea", "foot-to-hand": "Oina eskura",
+  "reverse-foot-to-hand": "Alderantzizko oina eskura", "handstand-on-feet": "Esku-oreka oinetan",
+  "bicep-stand": "Esku-oreka bizepsetan", "hand-to-hand": "Eskuz esku (L-base)",
+  "reverse-hand-to-hand": "Alderantzizko eskuz esku", "side-plank": "Alboko ohola", "free-bird": "Txori librea (eskurik gabe)",
+  "straddle-throne": "Tronu irekia", "thinker": "Pentsalaria", "pigeon": "Usoa", "croc": "Krokodiloa",
+  "bow-and-arrow": "Arkua eta gezia", "folded-leaf": "Hosto tolestua", "floating-paschimo": "Paschimottanasana flotatzailea",
+  "hangle-dangle": "Hangle dangle", "backbend": "Atzera-kurba lagundua", "super-yogi": "Super yogi", "straddle-bat": "Saguzarra",
+  "thigh-stand": "Izterren gainean zutik", "camel": "Gamelua", "bird-on-shoulders": "Txoria sorbaldetan",
+  "handstand-on-thighs": "Esku-oreka izterretan", "flag": "Bandera", "two-high": "Sorbaldetan zutik (two-high)",
+  "standing-f2h": "Oina eskura zutik", "standing-reverse-f2h": "Alderantzizko oina eskura zutik",
+  "handstand-on-shoulders": "Esku-oreka sorbaldetan", "standing-h2h": "Eskuz esku zutik", "shoulder-sit": "Sorbaldetan eserita",
+  "climb-to-shoulders": "Sorbaldetara igoera", "cupie": "Cupie (esku bakarrean zutik)",
+  "trio-back-bird": "Alderantzizko txoria hirukoan (bi flyer)", "trio-down-dog": "Txakurra behera hirukoan, flyer zintzilik",
+  "pyramid": "Piramidea", "trio-double-bird": "Bi baseko txoria (hirukoa)",
+  "bird-throne": "Txoritik tronura", "secretary-throne": "Idazkaritik tronura", "bird-side-star-bird": "Txoria – alboko izarra – txoria",
+  "candlestick-star": "Kandelatik izarrera", "reverse-star-throne": "Alderantzizko izarretik tronura",
+  "secretary-f2h": "Idazkaritik oina eskura", "back-plank-f2h": "Alderantzizko oholatik oina eskura",
+  "bird-reverse-h2h": "Txoritik alderantzizko eskuz eskura", "thigh-stand-h2h": "Izterretatik eskuz eskura (zutik)",
+  "plank-bird": "Oholatik txorira", "bird-back-bird": "Txoritik alderantzizko txorira", "throne-candlestick": "Tronutik kandelara",
+  "whale-high-whale": "Baleatik balea hegalarira", "star-reverse-star": "Izarretik alderantzizko izarrera",
+  "shoulder-sit-two-high": "Sorbaldetan eseritik two-high-ra", "first-flight": "Lehen hegaldia", "therapeutic-flow": "Sekuentzia terapeutikoa",
+  "throne-family": "Tronuaren familia", "bird-family": "Txoriaren familia", "star-family": "Izarraren familia",
+  "standing-warmup": "Zutik beroketa", "helicopter": "Helikopteroa", "ninja-star": "Ninja izarra", "catherine-wheel": "Katalinaren gurpila",
+  "barrel-roll": "Upela", "corkscrew": "Kortxo-kentzailea", "two-step": "2 urrats", "four-step": "4 urrats",
+  "ballerina": "Balerina", "carousel": "Karrusela", "spiral": "Espirala", "propeller": "Helizea", "waltz": "Valsa"
+};
+for (const it of SEED) if (EU[it.id]) it.name.eu = EU[it.id];

@@ -1,4 +1,4 @@
-import { LANGS, makeT } from "./i18n.js";
+import { LANGS, makeT, detectLang } from "./i18n.js";
 import { SEED, CATS, FLOW_TYPES, ROLES, STATUS, LEVELS, GUIDE_BASE, ACROPEDIA_BASE, ACROPEDIA_ALL } from "./catalog.js";
 import { PHOTOS } from "./photos.js";
 import { videoInfo, platformName, shrinkImage } from "./media.js";
@@ -13,12 +13,12 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const TABS = ["figures", "flows", "log", "progress", "friends", "data"];
 const LIB_PAGE = 40;
 const SEED_BY_ID = new Map(SEED.map((i) => [i.id, i]));
-const browserLang = (navigator.language || "en").slice(0, 2);
+
 const PLAY = `<svg class="ig-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>`;
 const IG = `<svg class="ig-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>`;
 
 const S = {
-  lang: getSetting("lang", LANGS[browserLang] ? browserLang : "en"),
+  lang: LANGS[getSetting("lang", "")] ? getSetting("lang", "") : detectLang(),
   roles: getSetting("roles", ["base", "flyer"]),
   items: new Map(),
   progress: new Map(),

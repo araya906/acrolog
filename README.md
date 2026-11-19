@@ -30,7 +30,7 @@ no build step, vanilla ES modules, IndexedDB on the device, no server, works off
 - **Instagram as a source**: every figure has a *Search #hashtag* button, and you can attach reel/post links.
   Once installed, Instagram → Share → **AcroLog** saves the link (Web Share Target); it waits in Figures until you attach it.
   Tracking parameters (`?igsh=`) are stripped. Previews load from Instagram only when you tap *Preview*.
-- **Backup**: export / import a JSON file. Languages: English, Spanish.
+- **Backup**: export / import a JSON file. Languages: English, Spanish, Basque (euskara). `node tools/check_i18n.mjs` checks that every language has every key.
 
 ## Run it
 

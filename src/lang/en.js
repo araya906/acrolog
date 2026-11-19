@@ -152,7 +152,8 @@ export default {
   privacy_points: [
     "No accounts, no tracking, no ads.",
     "Your progress, sessions, links and photos stay in this browser on this device. AcroLog has no server: only what you share with your Friends link leaves the phone, and only to the people you send it to.",
-    "Once installed, the app opens from your phone and makes no internet requests by itself. Internet is used only when you tap a link, Play / Preview a video, Check for updates, turn on video thumbnails, or turn on automatic sync with friends (then it talks to the AcroLog sync server when it opens and after changes).",
+    "Once installed, the app opens from your phone and makes no internet requests by itself. Internet is used only when you tap a link, Play / Preview a video, Check for updates, turn on video thumbnails, turn on automatic sync with friends (then it talks to the AcroLog sync server when it opens and after changes), or use community flows (see below).",
+    "Community flows: when you publish a flow, its name, description, type, level, steps, video link and your profile name are stored on the AcroLog server and anyone can see them. Your progress, sessions and notes are never sent. Unpublishing removes it from the server. Downloading community flows sends nothing about you.",
     "Uninstalling the app or clearing site data deletes them: keep a backup."
   ],
   delete_all: "Delete all my data",

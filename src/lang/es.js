@@ -152,7 +152,8 @@ export default {
   privacy_points: [
     "Sin cuentas, sin seguimiento, sin anuncios.",
     "Tu progreso, sesiones, enlaces y fotos se quedan en este navegador y este dispositivo. AcroLog no tiene servidor: solo sale lo que tú compartes con tu enlace de Amigos, y va únicamente a quien se lo envíes.",
-    "Una vez instalada, la app se abre desde tu móvil y no hace ninguna petición a internet por sí sola. Solo se usa internet al pulsar un enlace, Ver / Vista previa de un vídeo, Buscar actualizaciones, si activas las miniaturas de vídeo o si activas la sincronización con amigos (entonces contacta con el servidor de sincronización de AcroLog al abrirse y tras cada cambio).",
+    "Una vez instalada, la app se abre desde tu móvil y no hace ninguna petición a internet por sí sola. Solo se usa internet al pulsar un enlace, Ver / Vista previa de un vídeo, Buscar actualizaciones, si activas las miniaturas de vídeo si activas la sincronización con amigos (entonces contacta con el servidor de sincronización de AcroLog al abrirse y tras cada cambio) o si usas los flows de la comunidad (ver abajo).",
+    "Flows de la comunidad: al publicar un flow, su nombre, descripción, tipo, nivel, pasos, enlace de vídeo y tu nombre de perfil se guardan en el servidor de AcroLog y cualquiera puede verlos. Tu progreso, sesiones y notas nunca se envían. Despublicarlo lo borra del servidor. Descargar los flows de la comunidad no envía nada sobre ti.",
     "Desinstalar la app o borrar los datos del sitio los elimina: guarda una copia."
   ],
   delete_all: "Borrar todos mis datos",
