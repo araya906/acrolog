@@ -6,6 +6,9 @@ import { all, put, remove, clearAll, exportAll, importAll, getSetting, setSettin
 import { today, weekly, streakWeeks, totals, practice, statusOf, statusCounts, suggestions, findUrl, igInfo, tagUrl } from "./stats.js";
 import { SNAP_KEY, encodeSnap, decodeSnap, snapFromText, buildSnap, validateSnap, together, compare, sameName } from "./social.js";
 import { syncConfigured, pushSnap, pullSnaps, deleteSnap, newKey, sidFor } from "./sync.js";
+import { toItem, itemId, fetchCommunity, publishFlow, unpublishFlow, reportFlow } from "./community.js";
+import { cleanFlow } from "./flowcheck.js";
+import { FIG_IDS } from "./catalog.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -47,7 +50,10 @@ const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString
 const txt = (v) => (!v ? "" : typeof v === "string" ? v : v[S.lang] || v.en || "");
 const nm = (it) => (!it ? "?" : typeof it.name === "string" ? it.name : it.name[S.lang] || it.name.en);
 const figs = () => [...S.items.values()].filter((i) => i.kind === "fig");
-const flows = () => [...S.items.values()].filter((i) => i.kind === "flow");
+// Community flows count as yours (lists, log, progress, stats) once you track them: a status, a goal or a session.
+const tracked = (it) => !it.community || S.progress.has(it.id) || S.practice.has(it.id);
+const flows = () => [...S.items.values()].filter((i) => i.kind === "flow" && tracked(i));
+const communityFlows = () => [...S.items.values()].filter((i) => i.community);
 const prog = (id) => ({ id, base: 0, flyer: 0, notes: "", fav: false, ...S.progress.get(id) });
 const st = (id) => statusOf(S.progress.get(id), S.roles);
 const sortItems = (list) => list.sort((a, b) => a.level - b.level || nm(a).localeCompare(nm(b), S.lang));
@@ -107,7 +113,19 @@ async function load() {
   S.progress = new Map(progress.map((p) => [p.id, p]));
   S.sessions = sessions;
   S.refs = refs;
+  await loadCommunity();
   sortData();
+}
+
+// Downloaded community flows join the items, except your own published ones (you have the original) and
+// flows you reported.
+async function loadCommunity() {
+  for (const [id, i] of S.items) if (i.community) S.items.delete(id);
+  const mine = new Set([...S.items.values()].map((i) => i.pub).filter(Boolean));
+  const reported = new Set(getSetting("reported", []));
+  for (const c of await all("community")) {
+    if (c?.community && c.cid && !mine.has(c.cid) && !reported.has(c.cid) && !S.items.has(c.id)) S.items.set(c.id, c);
+  }
 }
 
 function sortData() {
@@ -188,6 +206,8 @@ function itemCard(it) {
   const pr = S.practice.get(it.id);
   const nrefs = S.refs.filter((r) => r.target === it.id).length;
   const sub = [it.kind === "fig" ? t("cat_" + it.cat) : t("ft_" + it.type)];
+  if (it.community) sub.push(t("comm_by", { x: it.by || "?" }));
+  if (it.pub) sub.push(t("comm_shared"));
   if (nrefs) sub.push(t("n_refs", { n: nrefs }));
   if (pr) sub.push(t("n_practiced", { n: pr.count }));
   if (it.video) sub.push("▶ " + t("video"));
@@ -223,13 +243,180 @@ function renderFigures() {
 }
 
 function renderFlows() {
-  $("#flow-types").innerHTML = ["all", ...FLOW_TYPES].map((c) => chip("ftype", c, c === "all" ? t("all") : t("ft_" + c), S.flowType === c)).join("");
+  $("#flow-types").innerHTML = ["all", ...FLOW_TYPES, "community"].map((c) => chip("ftype", c,
+    c === "all" ? t("all") : c === "community" ? t("community") : t("ft_" + c), S.flowType === c)).join("");
+  if (S.flowType === "community") return renderCommunity();
   const list = sortItems(flows().filter((it) => S.flowType === "all" || it.type === S.flowType));
   $("#flow-list").innerHTML = list.length ? byLevel(list) : `<p class="hint">${esc(t("none_match"))}</p>`;
 }
 
+// ---------- community flows (optional; server/flows.js) ----------
+let commBusy = false;
+
+function renderCommunity() {
+  const list = sortItems(communityFlows());
+  const checked = getSetting("commChecked", "");
+  const head = `<div class="card">
+    <h2>${esc(t("comm_title"))}</h2>
+    <p class="hint">${esc(t("comm_intro"))}</p>
+    ${syncConfigured() ? `<button type="button" class="btn primary wide" data-act="comm-get" ${commBusy ? "disabled aria-busy=\"true\"" : ""}>${esc(t(commBusy ? "comm_checking" : checked ? "comm_refresh" : "comm_get"))}</button>
+      <p class="hint" aria-live="polite">${esc(checked ? t("comm_checked", { d: new Date(checked).toLocaleString(S.lang, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) }) : t("comm_never"))}</p>
+      ${checked ? `<label class="check"><input type="checkbox" id="comm-auto" ${getSetting("commAuto", false) ? "checked" : ""}><span>${esc(t("comm_auto"))}</span></label>` : ""}`
+    : `<p class="alert warn">${esc(t("comm_unavailable"))}</p>`}
+  </div>`;
+  const empty = `<div class="empty"><p>${esc(t(checked ? "comm_empty" : "comm_empty_new"))}</p>
+    <button type="button" class="btn" data-act="new-flow">${esc(t("new_flow"))}</button></div>`;
+  $("#flow-list").innerHTML = head + (list.length ? byLevel(list) : empty);
+}
+
+async function pullCommunity(force = false) {
+  if (!syncConfigured() || commBusy) return;
+  if (!navigator.onLine) return force ? toast(t("comm_offline")) : undefined;
+  commBusy = true;
+  if (S.flowType === "community") renderFlows();
+  try {
+    const before = new Set(communityFlows().map((i) => i.id));
+    const { live, gone, cursor } = await fetchCommunity(getSetting("commCursor", null));
+    if (live.length) await put("community", live.map(toItem));
+    for (const cid of gone) await remove("community", itemId(cid));
+    setSetting("commCursor", cursor);
+    setSetting("commChecked", new Date().toISOString());
+    if (force && !getSetting("commAutoSet", false)) {
+      setSetting("commAuto", true); // first explicit check turns on "check when the app opens" (can be turned off)
+      setSetting("commAutoSet", true);
+    }
+    await loadCommunity();
+    const added = communityFlows().filter((i) => !before.has(i.id)).length;
+    if (force || added) toast(added ? t("comm_new", { n: added }) : live.length || gone.length ? t("comm_updated") : t("comm_nothing"));
+  } catch {
+    if (force) toast(t("comm_err"));
+  } finally {
+    commBusy = false;
+    refresh();
+    renderSheet();
+  }
+}
+
+// The sync key identifies you as the author of what you publish (same key as automatic sync).
+async function ensureKey() {
+  if (S.me?.key && S.me?.sid) return;
+  const key = S.me?.key || newKey();
+  S.me = { ...S.me, id: S.me?.id || uid(), key, sid: await sidFor(key) };
+  setSetting("me", S.me);
+}
+
+const commError = (e) => t({ slow_down: "comm_slow", too_many: "comm_too_many", hidden: "comm_hidden", bad_steps: "comm_bad", bad_name: "comm_bad", bad_video: "comm_bad_video" }[e?.message] || (e?.status ? "comm_err_server" : "comm_err"));
+
+async function publishItem(id) {
+  const it = S.items.get(id);
+  if (!it || it.community || it.kind !== "flow") return;
+  if (!syncConfigured()) return toast(t("comm_unavailable"));
+  if (!S.me?.name) {
+    closeSheet();
+    goto("friends");
+    return toast(t("comm_need_name"));
+  }
+  const unknown = (it.steps || []).filter((s) => !FIG_IDS.has(s));
+  if (unknown.length && !confirm(t("comm_own_steps", { x: unknown.map((s) => nm(S.items.get(s))).join(", ") }))) return;
+  let flow;
+  try {
+    flow = cleanFlow({ name: nm(it), desc: txt(it.desc), type: it.type, level: it.level, steps: (it.steps || []).filter((s) => FIG_IDS.has(s)),
+      video: it.video || "", tag: it.tag || "", by: S.me.name, lang: S.lang });
+  } catch (e) {
+    return toast(commError(e));
+  }
+  if (!it.pub && !confirm(t("comm_publish_confirm", { x: flow.name, by: flow.by }))) return;
+  try {
+    await ensureKey();
+    const res = await publishFlow(flow, S.me.key, it.pub || "");
+    const rec = { ...it, pub: res.id || it.pub, pubAt: new Date().toISOString() };
+    await put("items", rec);
+    S.items.set(rec.id, rec);
+    toast(t(it.pub ? "comm_updated_mine" : "comm_published"));
+  } catch (e) {
+    toast(commError(e));
+  }
+  refresh();
+  renderSheet();
+}
+
+async function unpublishItem(id, ask = true) {
+  const it = S.items.get(id);
+  if (!it?.pub) return true;
+  if (ask && !confirm(t("comm_unpublish_confirm", { x: nm(it) }))) return false;
+  try {
+    await ensureKey();
+    await unpublishFlow(it.pub, S.me.key);
+  } catch (e) {
+    if (e?.status !== 404) {
+      toast(commError(e));
+      return false;
+    }
+  }
+  const rec = { ...it };
+  delete rec.pub;
+  delete rec.pubAt;
+  await put("items", rec);
+  S.items.set(rec.id, rec);
+  if (ask) toast(t("comm_unpublished"));
+  refresh();
+  renderSheet();
+  return true;
+}
+
+async function reportItem(id) {
+  const it = S.items.get(id);
+  if (!it?.community) return;
+  const reason = prompt(t("comm_report_prompt", { x: nm(it) }), "");
+  if (reason === null) return;
+  try {
+    await ensureKey();
+    await reportFlow(it.cid, S.me.key, reason);
+  } catch (e) {
+    if (e?.status !== 404) return toast(commError(e));
+  }
+  setSetting("reported", [...new Set([...getSetting("reported", []), it.cid])].slice(-500));
+  S.items.delete(id);
+  closeSheet();
+  refresh();
+  toast(t("comm_reported"));
+}
+
+// A community flow copied into your own flows, to edit it your way.
+async function copyItem(id) {
+  const it = S.items.get(id);
+  if (!it) return;
+  const rec = { id: "u-" + uid(), kind: "flow", name: nm(it), type: it.type, level: it.level, steps: [...(it.steps || [])], tag: it.tag || "",
+    desc: txt(it.desc), updated: new Date().toISOString(), ...(it.video && { video: it.video }) };
+  await put("items", rec);
+  S.items.set(rec.id, rec);
+  refresh();
+  openSheet({ type: "item", id: rec.id });
+  toast(t("comm_copied"));
+}
+
+function communityBox(it) {
+  if (it.community) {
+    return `<div class="sync-box"><p class="hint">${esc(t("comm_by_long", { x: it.by || "?", d: fmtDate(new Date(it.updated).toISOString().slice(0, 10)) }))}</p>
+      <p class="hint">${esc(t("comm_check_steps"))}</p>
+      <div class="row"><button type="button" class="btn small" data-act="comm-copy" data-id="${esc(it.id)}">${esc(t("comm_copy"))}</button>
+      <button type="button" class="btn small danger" data-act="comm-report" data-id="${esc(it.id)}">${esc(t("comm_report"))}</button></div></div>`;
+  }
+  if (it.kind !== "flow" || !it.id.startsWith("u-") || !syncConfigured()) return "";
+  if (!it.pub) {
+    return `<div class="sync-box"><h3>${esc(t("comm_title"))}</h3><p class="hint">${esc(t("comm_share_hint"))}</p>
+      <button type="button" class="btn small" data-act="comm-publish" data-id="${esc(it.id)}">${esc(t("comm_share"))}</button></div>`;
+  }
+  const stale = (it.updated || "") > (it.pubAt || "");
+  return `<div class="sync-box"><h3>${esc(t("comm_title"))}</h3>
+    <p class="hint">${esc(t("comm_shared_on", { d: fmtDate(it.pubAt.slice(0, 10)) }))}</p>
+    ${stale ? `<p class="alert warn">${esc(t("comm_stale"))}</p>` : ""}
+    <div class="row">${stale ? `<button type="button" class="btn small primary" data-act="comm-publish" data-id="${esc(it.id)}">${esc(t("comm_update"))}</button>` : ""}
+    <button type="button" class="btn small ghost" data-act="comm-unpublish" data-id="${esc(it.id)}">${esc(t("comm_unpublish"))}</button></div></div>`;
+}
+
 function itemOptions(sel = "", kinds = ["fig", "flow"]) {
-  const g = (kind, label) => `<optgroup label="${esc(label)}">${sortItems([...S.items.values()].filter((i) => i.kind === kind))
+  const g = (kind, label) => `<optgroup label="${esc(label)}">${sortItems(kind === "fig" ? figs() : flows())
     .map((i) => opt(i.id, nm(i), sel)).join("")}</optgroup>`;
   return kinds.map((k) => g(k, t(k === "fig" ? "tab_figures" : "tab_flows"))).join("");
 }
@@ -332,11 +519,12 @@ function itemSheet(it) {
     <p class="hint">${esc(t("ref_hint"))}</p>
     ${usedIn.length ? `<h3>${esc(t("used_in"))}</h3><div class="row">${usedIn.map((fl) =>
       `<button type="button" class="chip" data-act="open" data-id="${esc(fl.id)}">${esc(nm(fl))}</button>`).join("")}</div>` : ""}
-    <div class="row end">
+    ${communityBox(it)}
+    ${it.community ? "" : `<div class="row end">
       <button type="button" class="btn ghost small" data-act="edit" data-id="${esc(it.id)}">${esc(t("edit"))}</button>
       ${edited ? `<button type="button" class="btn ghost small" data-act="reset-item" data-id="${esc(it.id)}">${esc(t("reset"))}</button>` : ""}
       <button type="button" class="btn danger small" data-act="del-item" data-id="${esc(it.id)}">${esc(t(seed ? "hide" : "delete"))}</button>
-    </div>`;
+    </div>`}`;
 }
 
 // Photo strip: your own photos (deletable) + credited reference photos + an "Add photo" tile.
@@ -743,7 +931,7 @@ function videoHtml(it) {
   if (it.video) links.push(link(v?.url || it.video, t("watch_on", { x: platformName(it.video) })));
   if (it.ap) links.push(link(ACROPEDIA_BASE + encodeURIComponent(it.ap) + "/", t("acropedia_page")));
   if (it.guide) links.push(link(GUIDE_BASE + it.guide, t("tutorial")));
-  if (Array.isArray(it.ext) && /^https:///.test(it.ext[0])) links.push(link(it.ext[0], t("tutorial_ext", { x: it.ext[1] || platformName(it.ext[0]) })));
+  if (Array.isArray(it.ext) && /^https:\/\//.test(it.ext[0])) links.push(link(it.ext[0], t("tutorial_ext", { x: it.ext[1] || platformName(it.ext[0]) })));
   if (!links.length) return "";
   return `<div class="video-box">
     ${v ? `<button type="button" class="player" data-act="play" data-id="${esc(it.id)}">${PLAY}<span>${esc(t("play_video"))}</span>
@@ -802,6 +990,7 @@ async function saveItem() {
   if (e.guide) rec.guide = e.guide;
   if (e.ext) rec.ext = e.ext;
   if (e.safety) rec.safety = e.safety;
+  if (e.pub) Object.assign(rec, { pub: e.pub, pubAt: e.pubAt });
   if (e.kind === "flow") Object.assign(rec, { type: e.type, steps: e.steps });
   else rec.cat = e.cat;
   await put("items", rec);
@@ -1099,6 +1288,11 @@ async function onClick(e) {
       return refresh();
     }
     case "log-today": return logToday(id);
+    case "comm-get": return pullCommunity(true);
+    case "comm-publish": return publishItem(id);
+    case "comm-unpublish": return unpublishItem(id);
+    case "comm-report": return reportItem(id);
+    case "comm-copy": return copyItem(id);
     case "add-ref": {
       const inp = $("#ref-url");
       const url = findUrl(inp.value);
@@ -1182,7 +1376,9 @@ async function onClick(e) {
     }
     case "del-item": {
       const it = S.items.get(id);
-      if (!confirm(t(SEED_BY_ID.has(id) ? "hide_confirm" : "delete_confirm", { x: nm(it) }))) return;
+      if (!it || it.community) return;
+      if (!confirm(t(SEED_BY_ID.has(id) ? "hide_confirm" : it.pub ? "delete_pub_confirm" : "delete_confirm", { x: nm(it) }))) return;
+      if (it.pub && !(await unpublishItem(id, false))) return;
       if (SEED_BY_ID.has(id)) {
         await put("items", { id, hidden: true });
         S.hidden++;
@@ -1251,6 +1447,8 @@ async function onClick(e) {
         clearTimeout(pushTimer);
         try { await deleteSnap(S.me.sid, S.me.key); } catch { toast(t("sync_off_offline")); }
       }
+      // Your published community flows are removed from the server too.
+      for (const it of [...S.items.values()].filter((i) => i.pub)) await unpublishItem(it.id, false).catch(() => {});
       await clearAll();
       S.me = null;
       S.thumbs = false;
@@ -1308,6 +1506,7 @@ async function onChange(e) {
     return schedulePush();
   }
   if (el.id === "sync-on") return setSync(el.checked);
+  if (el.id === "comm-auto") return setSetting("commAuto", el.checked);
   if (el.id === "friend-alias") {
     const fr = S.friends.find((f) => f.id === el.dataset.id);
     if (!fr) return;
@@ -1397,6 +1596,8 @@ async function init() {
     $("#lib-list").innerHTML = libList();
   });
   // Sync (only when turned on): catch up on open and when back online; flush pending uploads when leaving.
+  // Community flows: checked when the app opens only after you asked for them once (Flows → Community).
+  if (getSetting("commAuto", false)) pullCommunity();
   if (syncOn()) {
     if (getSetting("changed", "") > getSetting("lastPush", "")) pushMine();
     pullFriends();

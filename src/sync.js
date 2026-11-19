@@ -5,7 +5,17 @@ import { SYNC_URL } from "./config.js";
 
 let override = "";
 export const setSyncUrl = (url) => { override = url || ""; }; // tests
-export const syncUrl = () => (override || SYNC_URL).replace(/\/+$/, "");
+// Local testing only: localStorage "al.syncUrl" may point the app at a Worker on this machine
+// (http://127.0.0.1:<port> or http://localhost:<port>); anything else is ignored. See server/README.md.
+const localWorker = () => {
+  try {
+    const v = JSON.parse(localStorage.getItem("al.syncUrl") || '""');
+    return /^http:\/\/(127\.0\.0\.1|localhost)(:\d{2,5})?$/.test(v) ? v : "";
+  } catch {
+    return "";
+  }
+};
+export const syncUrl = () => (override || localWorker() || SYNC_URL).replace(/\/+$/, "");
 export const syncConfigured = () => /^https?:\/\//.test(syncUrl());
 
 export function newKey() {
@@ -19,7 +29,7 @@ export async function sidFor(key) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
 }
 
-async function call(path, opts = {}) {
+export async function call(path, opts = {}) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 12000);
   try {

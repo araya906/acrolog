@@ -2,10 +2,12 @@
 const DB = "acro-log";
 import { blobToDataUrl, dataUrlToBlob } from "./media.js";
 
-const VER = 3; // 2: "photos" store (your own photos of a figure, as image blobs). 3: "friends" (snapshots friends shared)
+const VER = 4; // 2: "photos" store (your own photos of a figure, as image blobs). 3: "friends" (snapshots friends shared)
+// 4: "community" (downloaded community flows; a cache, so it is not part of backups)
 export const STORES = ["items", "progress", "sessions", "refs", "photos", "friends"];
+const ALL = [...STORES, "community"];
 let dbp = null;
-const mem = Object.fromEntries(STORES.map((s) => [s, new Map()]));
+const mem = Object.fromEntries(ALL.map((s) => [s, new Map()]));
 
 function open() {
   if (dbp) return dbp;
@@ -14,7 +16,7 @@ function open() {
       const req = indexedDB.open(DB, VER);
       req.onupgradeneeded = () => {
         const db = req.result;
-        for (const s of STORES) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: "id" });
+        for (const s of ALL) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: "id" });
       };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => resolve(null);
@@ -61,7 +63,7 @@ export async function remove(store, id) {
 
 export async function clearAll() {
   const db = await open();
-  for (const s of STORES) {
+  for (const s of ALL) {
     mem[s].clear();
     if (db) await tx(db, s, "readwrite", (st) => st.clear());
   }
