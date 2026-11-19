@@ -27,6 +27,7 @@
       <input id="fig-q" type="search" autocomplete="off" data-i18n-ph="search_ph">
       <div class="filters" id="fig-cats"></div>
       <div class="filters" id="fig-status"></div>
+      <div class="list-head"><p class="hint" id="fig-count" aria-live="polite"></p><div class="viewtog" data-view="figures"></div></div>
       <div id="fig-list"></div>
       <button type="button" class="btn wide" data-act="new-fig" data-i18n="new_fig"></button>
     </section>
@@ -35,6 +36,7 @@
     <section id="tab-flows" class="tab" data-tab="flows" hidden>
       <p class="hint" data-i18n="flows_intro"></p>
       <div class="filters" id="flow-types"></div>
+      <div class="list-head"><p class="hint" id="flow-count" aria-live="polite"></p><div class="viewtog" data-view="flows"></div></div>
       <div id="flow-list"></div>
       <button type="button" class="btn wide" data-act="new-flow" data-i18n="new_flow"></button>
       <div class="card mt">
@@ -48,11 +50,13 @@
     <!-- 3. Log -->
     <section id="tab-log" class="tab" data-tab="log" hidden>
       <form id="session-form" class="card" novalidate>
-        <h2 id="s-title"></h2>
+        <div class="list-head"><h2 id="s-title"></h2>
+          <button type="button" class="btn small ghost" id="s-repeat" data-act="s-repeat" data-i18n="repeat_last" hidden></button></div>
         <div class="grid2">
           <label><span data-i18n="date"></span><input type="date" id="s-date"></label>
           <label><span data-i18n="minutes"></span><input type="number" id="s-min" min="0" step="5" inputmode="numeric"></label>
         </div>
+        <div class="mins" id="s-mins" role="group" data-i18n-aria="minutes"></div>
         <label><span data-i18n="partners"></span><input id="s-partners" list="partners-dl" autocomplete="off" data-i18n-ph="partners_ph"></label>
         <datalist id="partners-dl"></datalist>
         <fieldset>
@@ -74,7 +78,9 @@
 
     <!-- 4. Progress -->
     <section id="tab-progress" class="tab" data-tab="progress" hidden>
-      <p class="alert warn" id="progress-empty" data-i18n="progress_empty"></p>
+      <div class="empty" id="progress-empty"><p data-i18n="progress_empty"></p>
+        <div class="row"><button type="button" class="btn primary" data-goto="figures" data-i18n="cta_mark"></button>
+          <button type="button" class="btn" data-goto="log" data-i18n="cta_log"></button></div></div>
       <div class="kpis" id="kpis"></div>
       <div class="card"><h2 data-i18n="weekly_title"></h2><div id="weekly"></div></div>
       <div class="card"><h2 data-i18n="next_title"></h2><div class="items" id="next"></div></div>
@@ -133,6 +139,11 @@
         <button type="button" class="btn danger wide" data-act="delete-all" data-i18n="delete_all"></button>
       </div>
       <div class="card">
+        <h2 data-i18n="ob_title"></h2>
+        <p class="hint" data-i18n="ob_again_hint"></p>
+        <button type="button" class="btn wide" data-act="welcome" data-i18n="ob_again"></button>
+      </div>
+      <div class="card">
         <h2 data-i18n="update_title"></h2>
         <p class="hint" data-i18n="update_hint"></p>
         <button type="button" class="btn wide" data-act="check-update" data-i18n="update_btn"></button>
@@ -141,7 +152,9 @@
     </section>
   </main>
 
-  <nav class="tabs" id="tabs">
+  <button type="button" class="fab" id="fab" data-goto="log" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="fab_log"></span></button>
+
+  <nav class="tabs" id="tabs" data-i18n-aria="nav_label">
     <button data-goto="figures"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M7 10l5-1 5 1M9 21l3-7 3 7"/></svg><span data-i18n="tab_figures"></span></button>
     <button data-goto="flows"><svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M18 8l-5 8M6 8l5 8"/></svg><span data-i18n="tab_flows"></span></button>
     <button data-goto="log"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg><span data-i18n="tab_log"></span></button>
@@ -150,7 +163,7 @@
     <button data-goto="data"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span data-i18n="tab_data"></span></button>
   </nav>
 
-  <div class="modal" id="sheet" role="dialog" aria-modal="true" hidden>
+  <div class="modal" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
     <div class="sheet" id="sheet-body"></div>
   </div>
   <div class="zoom" id="zoom" data-act="zoom-close" hidden><img alt=""></div>

@@ -40,7 +40,8 @@ const S = {
   sync: getSetting("sync", false),
   thumbs: getSetting("thumbs", false), // show YouTube video thumbnails (loaded from i.ytimg.com)
   AP: null, // Acropedia library, loaded on first use
-  lib: { q: "", tag: "", n: LIB_PAGE }
+  lib: { q: "", tag: "", n: LIB_PAGE },
+  view: { figures: "list", flows: "list", ...getSetting("view", {}) } // list or grid, per tab
 };
 let t = makeT(S.lang);
 
@@ -165,6 +166,7 @@ function applyStatic() {
   document.documentElement.lang = S.lang;
   $$("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   $$("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+  $$("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
   $$("[data-i18n-list]").forEach((el) => { el.innerHTML = t.list(el.dataset.i18nList).map((x) => `<li>${esc(x)}</li>`).join(""); });
   $("#lang").innerHTML = Object.entries(LANGS).map(([k, v]) => opt(k, v, S.lang)).join("");
   const rv = S.roles.length === 2 ? "both" : S.roles[0];
@@ -194,6 +196,7 @@ function goto(tab) {
   $$("#tabs button").forEach((b) => b.setAttribute("aria-current", b.dataset.goto === tab ? "page" : "false"));
   if (location.hash !== "#" + tab) history.replaceState(null, "", "#" + tab);
   window.scrollTo(0, 0);
+  $("#fab").hidden = !["figures", "flows", "progress"].includes(tab);
   if (tab === "friends") pullFriends();
 }
 
@@ -222,12 +225,54 @@ function itemCard(it) {
   </button>`;
 }
 
-function byLevel(list) {
+function byLevel(list, view = "list") {
   return LEVELS.map((l) => {
     const xs = list.filter((i) => i.level === l);
-    return xs.length ? `<h3 class="lvl-h">${esc(t.list("levels")[l])} <span class="hint">${xs.length}</span></h3><div class="items">${xs.map(itemCard).join("")}</div>` : "";
+    if (!xs.length) return "";
+    const body = view === "grid" ? `<div class="grid">${xs.map(gridCard).join("")}</div>` : `<div class="items">${xs.map(itemCard).join("")}</div>`;
+    return `<h3 class="lvl-h">${esc(t.list("levels")[l])} <span class="hint">${xs.length}</span></h3>${body}`;
   }).join("");
 }
+
+// Grid card: your photo, a reference photo or (if thumbnails are on) the YouTube frame; otherwise a generated icon:
+// the item's initials on a colour of its category, over a faint figure/flow glyph.
+const CAT_HUE = { lbase: 18, standing: 205, therapeutic: 150, trio: 275, transition: 38, flow: 225, washing: 190, pop: 335 };
+const GLYPH = {
+  fig: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M7 10l5-1 5 1M9 21l3-7 3 7"/></svg>`,
+  flow: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M18 8l-5 8M6 8l5 8"/></svg>`
+};
+const initials = (name) => (String(name).match(/[\p{L}\p{N}]+/gu) || ["?"]).slice(0, 2).map((w) => w[0].toLocaleUpperCase()).join("");
+const hueOf = (it) => {
+  let h = 0;
+  for (const c of it.id) h = (h * 31 + c.charCodeAt(0)) % 997;
+  return ((CAT_HUE[it.kind === "fig" ? it.cat : it.type] ?? 210) + (h % 24) - 12 + 360) % 360;
+};
+
+function gridCard(it) {
+  const p = S.progress.get(it.id);
+  const thumb = thumbOf(it.id);
+  const pic = thumb ? `<img class="pic" src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+    : `<span class="gen" style="--h:${hueOf(it)}" aria-hidden="true">${GLYPH[it.kind] || ""}<span>${esc(initials(nm(it)))}</span></span>`;
+  const roles = S.roles.map((r) => `<span title="${esc(t("role_" + r))}">${esc(t("role_" + r)[0])} <span class="dot s${p?.[r] ?? 0}"></span></span>`).join("");
+  return `<button type="button" class="card-g s${st(it.id)}" data-act="open" data-id="${esc(it.id)}">
+    ${pic}${p?.fav ? `<span class="fav" aria-label="${esc(t("fav"))}">★</span>` : ""}${it.community ? `<span class="badge">${esc(t("community"))}</span>` : ""}
+    <span class="meta"><b>${esc(nm(it))}</b>${pill(st(it.id))}<span class="rl">${dots(it.level)}${roles}</span></span>
+  </button>`;
+}
+
+const LIST_ICO = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`;
+const GRID_ICO = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;
+function renderViewToggles() {
+  $$(".viewtog").forEach((el) => {
+    const tab = el.dataset.view, v = S.view[tab];
+    el.setAttribute("role", "group");
+    el.setAttribute("aria-label", t("view_label"));
+    el.innerHTML = `<button type="button" data-act="view" data-tab="${tab}" data-v="list" aria-pressed="${v !== "grid"}" aria-label="${esc(t("view_list"))}" title="${esc(t("view_list"))}">${LIST_ICO}</button>
+      <button type="button" data-act="view" data-tab="${tab}" data-v="grid" aria-pressed="${v === "grid"}" aria-label="${esc(t("view_grid"))}" title="${esc(t("view_grid"))}">${GRID_ICO}</button>`;
+  });
+}
+
+const noMatch = (act) => `<div class="empty"><p>${esc(t("none_match"))}</p><button type="button" class="btn" data-act="${act}">${esc(t("filters_clear"))}</button></div>`;
 
 function renderFigures() {
   const f = S.fig;
@@ -238,16 +283,20 @@ function renderFigures() {
   const list = sortItems(figs().filter((it) => (f.cat === "all" || it.cat === f.cat)
     && (f.status === "all" || st(it.id) === Number(f.status))
     && (!q || nm(it).toLowerCase().includes(q) || (it.tag || "").includes(q))));
-  $("#fig-list").innerHTML = list.length ? byLevel(list) : `<p class="hint">${esc(t("none_match"))}</p>`;
+  $("#fig-list").innerHTML = list.length ? byLevel(list, S.view.figures) : noMatch("fig-clear");
+  $("#fig-count").textContent = t("n_shown", { n: list.length });
+  renderViewToggles();
   renderInbox();
 }
 
 function renderFlows() {
   $("#flow-types").innerHTML = ["all", ...FLOW_TYPES, "community"].map((c) => chip("ftype", c,
     c === "all" ? t("all") : c === "community" ? t("community") : t("ft_" + c), S.flowType === c)).join("");
+  renderViewToggles();
   if (S.flowType === "community") return renderCommunity();
   const list = sortItems(flows().filter((it) => S.flowType === "all" || it.type === S.flowType));
-  $("#flow-list").innerHTML = list.length ? byLevel(list) : `<p class="hint">${esc(t("none_match"))}</p>`;
+  $("#flow-list").innerHTML = list.length ? byLevel(list, S.view.flows) : noMatch("flow-clear");
+  $("#flow-count").textContent = t("n_shown", { n: list.length });
 }
 
 // ---------- community flows (optional; server/flows.js) ----------
@@ -256,6 +305,7 @@ let commBusy = false;
 function renderCommunity() {
   const list = sortItems(communityFlows());
   const checked = getSetting("commChecked", "");
+  $("#flow-count").textContent = list.length ? t("n_shown", { n: list.length }) : "";
   const head = `<div class="card">
     <h2>${esc(t("comm_title"))}</h2>
     <p class="hint">${esc(t("comm_intro"))}</p>
@@ -266,7 +316,7 @@ function renderCommunity() {
   </div>`;
   const empty = `<div class="empty"><p>${esc(t(checked ? "comm_empty" : "comm_empty_new"))}</p>
     <button type="button" class="btn" data-act="new-flow">${esc(t("new_flow"))}</button></div>`;
-  $("#flow-list").innerHTML = head + (list.length ? byLevel(list) : empty);
+  $("#flow-list").innerHTML = head + (list.length ? byLevel(list, S.view.flows) : empty);
 }
 
 async function pullCommunity(force = false) {
@@ -443,19 +493,28 @@ function renderInbox() {
 }
 
 // ---------- detail / editor sheet ----------
+let sheetOpener = null;
 function openSheet(state) {
+  if ($("#sheet").hidden) sheetOpener = document.activeElement;
   S.sheet = state;
   renderSheet();
   $("#sheet").hidden = false;
   document.body.classList.add("locked");
   $("#sheet .sheet").scrollTop = 0;
+  $("#sheet-title")?.focus({ preventScroll: true });
 }
 
 function closeSheet() {
+  if (S.sheet?.type === "welcome") setSetting("onboarded", true);
   S.sheet = null;
   $("#sheet").hidden = true;
   $("#sheet-body").innerHTML = "";
   document.body.classList.remove("locked");
+  // Back to what opened the sheet (or the same card, if the list was re-rendered meanwhile).
+  const back = sheetOpener?.isConnected ? sheetOpener
+    : sheetOpener?.dataset?.id ? $$(`[data-act="${sheetOpener.dataset.act}"]`).find((el) => el.dataset.id === sheetOpener.dataset.id && el.offsetParent) : null;
+  back?.focus({ preventScroll: true });
+  sheetOpener = null;
 }
 
 function renderSheet() {
@@ -477,13 +536,15 @@ function renderSheet() {
     $("#sheet-body").innerHTML = partnerSheet(S.sheet.name);
   } else if (type === "incoming") {
     $("#sheet-body").innerHTML = incomingSheet(S.sheet.snap);
+  } else if (type === "welcome") {
+    $("#sheet-body").innerHTML = welcomeSheet();
   } else if (type === "link") {
     $("#sheet-body").innerHTML = sheetTop(t("share_title")) + `<p class="hint">${esc(t("link_manual"))}</p>
       <textarea readonly rows="5" class="mono" data-act-select>${esc(S.sheet.url)}</textarea>`;
   }
 }
 
-const sheetTop = (title) => `<div class="sheet-top"><h2>${esc(title)}</h2>
+const sheetTop = (title) => `<div class="sheet-top"><h2 id="sheet-title" tabindex="-1">${esc(title)}</h2>
   <button type="button" class="x big" data-act="close" aria-label="${esc(t("close"))}">×</button></div>`;
 
 function itemSheet(it) {
@@ -502,6 +563,7 @@ function itemSheet(it) {
     ${it.kind === "flow" ? (steps.length ? `<ol class="steps-list">${steps.map((id) =>
       `<li><button type="button" class="link" data-act="open" data-id="${esc(id)}">${esc(nm(S.items.get(id)))}</button> ${pill(st(id))}</li>`).join("")}</ol>`
       : `<p class="alert warn">${esc(t("no_steps"))}</p>`) : ""}
+    <p class="hint">${esc(t("status_hint"))}</p>
     ${ROLES.map((r) => `<fieldset class="${S.roles.includes(r) ? "" : "muted"}"><legend>${esc(t("role_" + r))}</legend>
       <div class="status-seg">${STATUS.map((v) => `<button type="button" class="s${v}" data-act="status" data-id="${esc(it.id)}" data-role="${r}" data-v="${v}" aria-pressed="${p[r] === v}">${esc(statusName(v))}</button>`).join("")}</div></fieldset>`).join("")}
     <p class="hint">${esc(pr ? t("practiced_last", { n: pr.count, d: fmtDate(pr.last) }) : t("never_practiced"))}</p>
@@ -999,6 +1061,23 @@ async function saveItem() {
   openSheet({ type: "item", id: rec.id });
 }
 
+// ---------- first run ----------
+function welcomeSheet() {
+  const rv = S.roles.length === 2 ? "both" : S.roles[0];
+  return sheetTop(t("ob_title")) + `
+    <p>${esc(t("ob_intro"))}</p>
+    <label><span>${esc(t("ob_lang"))}</span><select id="ob-lang">${Object.entries(LANGS).map(([k, v]) => opt(k, v, S.lang)).join("")}</select></label>
+    <fieldset><legend>${esc(t("roles_title"))}</legend><div class="choices">
+      ${[["both", "roles_both"], ["base", "role_base"], ["flyer", "role_flyer"]].map(([v, k]) =>
+        `<label><input type="radio" name="ob-roles" value="${v}" ${rv === v ? "checked" : ""}><span>${esc(t(k))}</span></label>`).join("")}</div></fieldset>
+    <h3>${esc(t("ob_how"))}</h3>
+    <ol class="ob-steps">${t.list("ob_steps").map((x, i) => `<li><span class="n">${i + 1}</span><span>${esc(x)}</span></li>`).join("")}</ol>
+    <div class="ob-legend">${STATUS.map((v) => pill(v)).join("")}</div>
+    <p class="hint">${esc(t("ob_private"))}</p>
+    <button type="button" class="btn primary wide" data-act="ob-done" data-v="figures">${esc(t("cta_mark"))}</button>
+    <button type="button" class="btn ghost wide mt" data-act="ob-done" data-v="log">${esc(t("cta_log"))}</button>`;
+}
+
 // ---------- log ----------
 function renderLog() {
   const d = S.draft;
@@ -1013,10 +1092,14 @@ function renderLog() {
     || `<span class="hint">${esc(t("quick_none"))}</span>`;
   $("#s-mood").innerHTML = [1, 2, 3, 4, 5].map((v) => `<button type="button" data-act="mood" data-v="${v}" aria-pressed="${d.mood === v}">${esc(t.list("moods")[v])}</button>`).join("");
   $("#s-cancel").hidden = !d.editing;
+  $("#s-repeat").hidden = !!d.editing || !S.sessions.length;
+  const min = Number($("#s-min").value) || 0;
+  $("#s-mins").innerHTML = [30, 60, 90, 120, 180].map((m) => `<button type="button" class="chip" data-act="s-min" data-v="${m}" aria-pressed="${min === m}">${m} min</button>`).join("");
   $("#s-title").textContent = t(d.editing ? "edit_session" : "new_session");
   const partners = [...new Set([...S.sessions.flatMap((s) => s.partners || []), ...S.friends.map((f) => f.alias || f.name)])].sort();
   $("#partners-dl").innerHTML = partners.map((p) => `<option value="${esc(p)}">`).join("");
-  $("#sessions").innerHTML = S.sessions.slice(0, 60).map(sessionCard).join("") || `<p class="hint">${esc(t("no_sessions"))}</p>`;
+  $("#sessions").innerHTML = S.sessions.slice(0, 60).map(sessionCard).join("")
+    || `<div class="empty"><p>${esc(t("no_sessions_cta"))}</p><button type="button" class="btn" data-act="s-focus">${esc(t("cta_log"))}</button></div>`;
 }
 
 function sessionCard(s) {
@@ -1288,6 +1371,40 @@ async function onClick(e) {
       return refresh();
     }
     case "log-today": return logToday(id);
+    case "view": {
+      S.view = { ...S.view, [b.dataset.tab]: b.dataset.v === "grid" ? "grid" : "list" };
+      setSetting("view", S.view);
+      return b.dataset.tab === "flows" ? renderFlows() : renderFigures();
+    }
+    case "fig-clear":
+      S.fig = { q: "", cat: "all", status: "all" };
+      $("#fig-q").value = "";
+      return renderFigures();
+    case "flow-clear":
+      S.flowType = "all";
+      return renderFlows();
+    case "welcome": return openSheet({ type: "welcome" });
+    case "ob-done":
+      setSetting("onboarded", true);
+      closeSheet();
+      goto(b.dataset.v);
+      if (b.dataset.v === "log") $("#s-min").focus();
+      return;
+    case "s-min":
+      $("#s-min").value = b.dataset.v;
+      return renderLog();
+    case "s-focus":
+      window.scrollTo(0, 0);
+      return $("#s-min").focus();
+    case "s-repeat": {
+      const last = S.sessions[0];
+      if (!last) return;
+      S.draft.items = [...new Set([...S.draft.items, ...(last.items || []).filter((x) => S.items.has(x))])];
+      if (!$("#s-min").value && last.minutes) $("#s-min").value = last.minutes;
+      if (!$("#s-partners").value && last.partners?.length) $("#s-partners").value = last.partners.join(", ");
+      renderLog();
+      return toast(t("repeat_done"));
+    }
     case "comm-get": return pullCommunity(true);
     case "comm-publish": return publishItem(id);
     case "comm-unpublish": return unpublishItem(id);
@@ -1484,15 +1601,16 @@ async function onClick(e) {
 
 async function onChange(e) {
   const el = e.target;
-  if (el.id === "lang") {
+  if (el.id === "lang" || el.id === "ob-lang") {
     S.lang = el.value;
     setSetting("lang", S.lang);
     t = makeT(S.lang);
     return renderAll();
   }
-  if (el.name === "roles") {
+  if (el.name === "roles" || el.name === "ob-roles") {
     S.roles = el.value === "both" ? ["base", "flyer"] : [el.value];
     setSetting("roles", S.roles);
+    $$("[name=roles]").forEach((r) => { r.checked = r.value === el.value; });
     return refresh();
   }
   if (el.id === "thumbs" || el.id === "lib-thumbs") {
@@ -1578,6 +1696,8 @@ async function init() {
   goto(incoming ? "friends" : location.hash.slice(1) || "figures");
   await handleShare();
   if (incoming) receiveSnap(incoming);
+  else if (!getSetting("onboarded", false) && !S.sessions.length && !S.progress.size) openSheet({ type: "welcome" });
+  else setSetting("onboarded", true);
   document.addEventListener("click", onClick);
   document.addEventListener("change", onChange);
   $("#fig-q").addEventListener("input", (e) => { S.fig.q = e.target.value; renderFigures(); });

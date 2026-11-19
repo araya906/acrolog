@@ -30,6 +30,10 @@ no build step, vanilla ES modules, IndexedDB on the device, no server, works off
   you can update or unpublish it. Report anything wrong or unsafe: a flow is hidden after reports from several people.
   Needs the sync Worker (see [server/README.md](server/README.md)); downloading sends nothing about you, and the app checks
   on start only after you asked for community flows once (a setting you can turn off).
+- **Easy to use**: a short welcome on first run (language, roles, how tracking works), a **list / grid** switch on
+  Figures and Flows (grid cards show the photo, the YouTube frame if thumbnails are on, or a generated icon; remembered per
+  tab), a quick **+ Log** button, minute presets and *Same as last time* in the log, empty states that say what to do
+  next, 44 px touch targets, visible focus rings and AA-contrast status colours in light and dark mode.
 - **Log**: practice sessions with date, minutes, partners, what you practised, how it went and notes.
   "+ Practised today" on any figure adds it to today's session.
 - **Progress**: sessions, hours, weekly streak, sessions per week, status per role, solid figures by level,
