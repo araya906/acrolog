@@ -9,6 +9,9 @@
 // every write, so nobody can write under a sid without its key (not even a friend who knows the sid from your link).
 // A snapshot can be read only by someone who has the sid, which travels inside the friend link.
 // The snapshot is the same data the share link already carries.
+//
+// Community flows (flows anyone can publish and everyone can download): /v1/flows…, see flows.js.
+import { flowsRoute } from "./flows.js";
 
 const ID_RE = /^[0-9a-f]{32}$/;
 const MAX_BODY = 64 * 1024;
@@ -32,6 +35,8 @@ async function route(req, env) {
   const url = new URL(req.url);
   const parts = url.pathname.split("/").filter(Boolean);
   if (!parts.length && req.method === "GET") return json({ ok: true, app: "acrolog-sync", v: 1 });
+
+  if (parts[0] === "v1" && (parts[1] === "flows" || parts[1] === "mod")) return flowsRoute(req, env, url, parts, { json, sha256 });
 
   if (parts[0] === "v1" && parts[1] === "snaps" && parts.length === 2 && req.method === "GET") {
     const ids = [...new Set((url.searchParams.get("ids") || "").split(",").filter((id) => ID_RE.test(id)))].slice(0, 100);
@@ -84,7 +89,7 @@ function corsHeaders(req, env) {
   const allow = allowed.includes("*") ? "*" : allowed.includes(origin) ? origin : allowed[0];
   return {
     "Access-Control-Allow-Origin": allow,
-    "Access-Control-Allow-Methods": "GET, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin"
