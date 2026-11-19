@@ -7,7 +7,8 @@ no build step, vanilla ES modules, IndexedDB on the device, no server, works off
   **as base and as flyer**: Not started → Learning → With spotter → Solid → Mastered. Notes, goal star, edit or add your own.
   20 figures come with credited reference photos (Wikimedia Commons), many link to a Partner Acrobatics tutorial,
   and you can **add your own photos** (camera or gallery; shrunk to ≤1280 px and kept on the device).
-- **Flows** (75): transitions, flows and 54 washing machines, as ordered steps of figures, tracked the same way.
+- **Flows** (93): transitions, flows, 52 washing machines and 20 **pops & whips** (dynamic transitions such as bird pops,
+  pops to hand to hand and reverse pops, each with a safety note: a spotter is strongly recommended), as ordered steps of figures, tracked the same way.
   Washing machines include their **video** (from Acropedia, tap to play) and Acropedia page; their steps start empty on
   purpose: watch the video and add the steps the way your teacher breaks them down. Any flow can have a video link.
 - **Acropedia library**: all 1,147 washing machines listed on Acropedia, searchable by name, family and tag, each with

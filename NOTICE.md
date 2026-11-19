@@ -19,5 +19,10 @@ and the app asks users to credit the creators named in the original post.
 
 ## Other links (not bundled)
 
-- Tutorial links point to the [Partner Acrobatics manual](https://partneracrobatics.com/manual/).
+- Tutorial links point to the [Partner Acrobatics manual](https://partneracrobatics.com/manual/), including the pops and
+  whips pages used by the *Pops & whips* family (e.g. back plank pop to hand to hand, calf pop to two-high).
+- *Bird pops* links to [Yoga International's "Intro to Bird Pops" tutorial](https://yogainternational.com/class/acroyoga-tutorial-intro-to-bird-pops/)
+  (their content; not copied).
+- Pop videos (Pop 'n' roll, Tuck whips, PopCycle, Popping infinity, Reverse star to ashtavakrasana pops, Popping barrel
+  rolls, Whip prep) are the YouTube links listed on Acropedia, checked on 2026-11-19; they belong to their creators.
 - Figure and flow names are common acroyoga terminology; descriptions and levels are AcroLog's own.

@@ -255,5 +255,9 @@ export default {
   sync_off_done: "Sincronización desactivada. Tu copia se borró del servidor.",
   sync_off_offline: "Sincronización desactivada, pero no se pudo conectar con el servidor para borrar tu copia. Actívala y desactívala de nuevo con conexión.",
   install_btn: "Instalar app",
-  install_hint: "Funciona sin conexión una vez instalada."
+  install_hint: "Funciona sin conexión una vez instalada.",
+  ft_pop: "Pops y látigos",
+  pop_safety_title: "Seguridad:",
+  pop_safety: "Movimiento dinámico: se recomienda mucho tener spotter. Apréndelo sobre colchoneta, empieza bajo y pequeño, y acordad una palabra para parar.",
+  tutorial_ext: "Tutorial ({x})"
 };

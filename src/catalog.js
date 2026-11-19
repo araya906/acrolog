@@ -13,7 +13,7 @@ export const ACROPEDIA_BASE = "https://www.acrolove.org/acropedia/skill/";
 export const ACROPEDIA_ALL = "https://www.acrolove.org/acropedia/#/all?view=list&sort=az";
 
 export const CATS = ["lbase", "standing", "therapeutic", "trio"];
-export const FLOW_TYPES = ["transition", "flow", "washing"];
+export const FLOW_TYPES = ["transition", "flow", "washing", "pop"];
 export const ROLES = ["base", "flyer"];
 export const STATUS = [0, 1, 2, 3, 4]; // not started, learning, with spotter, solid, mastered
 export const LEVELS = [1, 2, 3, 4];
@@ -158,18 +158,41 @@ export const FLOWS = [
   fl("somersault", "Somersault", "Voltereta", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=IhqUPYA2J7k", ap: "somersault" }),
   fl("eagle-roll", "Eagle roll", "Rodada del águila", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=q5YJBZZhoGo", ap: "eagle-roll" }),
   fl("music-box", "Music box", "Caja de música", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=6e9BwNVxSzg", ap: "music-box" }),
-  fl("whip-prep", "Whip prep", "Preparación del látigo", "washing", 3, [], "acroyogawhip", { video: "https://www.youtube.com/watch?v=whC19SdcUvg", ap: "whip-prep" }),
-  fl("popping-barrel-rolls", "Popping barrel rolls", "Barriles con pop", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/6uRJVxmhL8Y", ap: "popping-barrel-rolls" }),
+  fl("whip-prep", "Whip prep", "Preparación del látigo", "pop", 3, [], "acroyogawhip", { video: "https://www.youtube.com/watch?v=whC19SdcUvg", ap: "whip-prep" }),
+  fl("popping-barrel-rolls", "Popping barrel rolls", "Barriles con pop", "pop", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/6uRJVxmhL8Y", ap: "popping-barrel-rolls" }),
   fl("swimming-side-stars", "Swimming side stars", "Estrellas laterales nadando", "washing", 3, [], "sidestar", { video: "https://youtu.be/Ev1-ItnkU9M", ap: "swimming-side-stars" }),
   fl("starfish-roll", "Starfish roll", "Rodada estrella de mar", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=alAsPIBq2qM", ap: "starfish-roll" }),
   fl("rotisseries", "Rotisseries", "Rostizador", "washing", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/vPTh_dUi8VE", ap: "rotisseries" }),
   fl("pizza-flipper", "Pizza flipper", "Volteador de pizza", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=y4_8Fcc-WAI", ap: "pizza-flipper" }),
   fl("ninja-copter", "Ninja copter", "Ninja copter", "washing", 3, [], "acroyogahelicopter", { video: "https://youtu.be/E8mhA3IWJHM", ap: "ninja-copter" }),
   fl("shoulderang", "Shoulderang", "Shoulderang", "washing", 4, [], "acroyogawashingmachine", { video: "https://youtu.be/wRuzYvVf1JI", ap: "shoulderang" }),
-  fl("waltz", "Waltz", "Vals", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=2bG9JV9Dwzg", ap: "waltz" })
+  fl("waltz", "Waltz", "Vals", "washing", 3, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=2bG9JV9Dwzg", ap: "waltz" }),
+  // Pops and whips: dynamic transitions where the base launches (pops) the flyer from one position to another.
+  // Every pop shows the general safety note (pop_safety); "safety" adds a specific one. Tutorials: Partner Acrobatics
+  // manual (guide); videos: Acropedia (ap + video); another tutorial page: ext = [url, source name].
+  fl("bird-pops", "Bird pops (\"popcorn\")", "Pops en pájaro (\"palomitas\")", "pop", 2, ["front-bird"], "birdpops", { ext: ["https://yogainternational.com/class/acroyoga-tutorial-intro-to-bird-pops/", "Yoga International"], safety: {"en":"Start with tiny pops back into the same bird; the flyer stays straight and lands on the same spot.","es":"Empieza con pops pequeños de vuelta al mismo pájaro; el flyer se mantiene recto y aterriza en el mismo sitio.","eu":"Hasi pop txikiekin txori berera itzuliz; flyerra zuzen mantentzen da eta toki berean lurreratzen da."} }),
+  fl("tempo-thigh-stand", "Tempo to thigh stand", "Tempo a muslos", "pop", 2, ["thigh-stand"], "thighstand", { guide: "/standing-acrobatics/standing-basics/tempo-lift-thigh-stand/" }),
+  fl("back-whippop-throne", "Back whip-pop to throne", "Whip-pop de espalda a trono", "pop", 3, ["back-bird", "throne"], "acroyogawhip", { guide: "/l-basing/back-whippop-to-throne/" }),
+  fl("pops-throne-f2h-whale", "Pops: throne – foot to hand – high flying whale", "Pops: trono – pie a mano – ballena voladora", "pop", 3, ["throne", "foot-to-hand", "high-flying-whale"], "foottohand", { guide: "/l-basing/pops-whips-throne-f2h-high-flying-whale/" }),
+  fl("pop-n-roll", "Pop 'n' roll", "Pop 'n' roll", "pop", 3, [], "acroyogawashingmachine", { video: "https://youtu.be/OooDR1XrtUI", ap: "pop-n-roll" }),
+  fl("tuck-whips", "Tuck whips", "Tuck whips", "pop", 3, [], "acroyogawhip", { video: "https://youtu.be/Xj6VdcLHdLI", ap: "tuck-whips" }),
+  fl("popcycle", "PopCycle", "PopCycle", "pop", 4, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=mpa_x-PhTM0", ap: "popcycle" }),
+  fl("popping-infinity", "Popping infinity", "Infinito con pops", "pop", 4, [], "acroyogawashingmachine", { video: "https://www.youtube.com/watch?v=ycXUYNTmvNE", ap: "popping-infinity" }),
+  fl("reverse-star-ashtavakrasana-pops", "Reverse star to ashtavakrasana pops", "Pops de estrella invertida a ashtavakrasana", "pop", 4, ["reverse-star"], "reversestar", { video: "https://www.youtube.com/watch?v=CIBm4zhw3Eg", ap: "reverse-star-to-ashtavakrasana-pops" }),
+  fl("back-plank-pop-h2h", "Back plank pop to hand to hand", "Pop de plancha invertida a mano a mano", "pop", 4, ["back-plank", "hand-to-hand"], "handtohand", { guide: "/l-basing/l-base-intermediate-advanced/back-plank-pop-hand-hand/" }),
+  fl("star-pop-h2h", "Star pop to hand to hand", "Pop de estrella a mano a mano", "pop", 4, ["star", "hand-to-hand"], "handtohand", { guide: "/l-basing/l-base-intermediate-advanced/jump-star-pop-hand-hand/" }),
+  fl("shin-pop-h2h", "Shin pop to hand to hand", "Pop de espinillas a mano a mano", "pop", 4, ["hand-to-hand"], "handtohand", { guide: "/l-basing/l-base-intermediate-advanced/shin-pop-hand-2-hand/" }),
+  fl("reverse-bird-pop-h2h", "Reverse bird pop to hand to hand", "Pop de pájaro invertido a mano a mano", "pop", 4, ["back-bird", "hand-to-hand"], "handtohand", { guide: "/l-basing/pop-reverse-bird-to-h2h/" }),
+  fl("belly-pop-reverse-h2h", "Belly pop to reverse hand to hand", "Pop de barriga a mano a mano invertido", "pop", 4, ["front-bird", "reverse-hand-to-hand"], "reversehandtohand", { guide: "/l-basing/l-base-intermediate-advanced/belly-pop-reverse-hand-2-hand/", safety: {"en":"Reverse pop: the flyer cannot see the hands they land in. Drill it low, with a spotter at the flyer's shoulders.","es":"Pop invertido: el flyer no ve las manos donde aterriza. Practícalo bajo, con un spotter en los hombros del flyer.","eu":"Alderantzizko pop-a: flyerrak ez ditu ikusten lurreratzen den eskuak. Landu behetik, zaintzaile bat flyerraren sorbaldetan dela."} }),
+  fl("pops-reverse-star-f2h-whip", "Reverse star – foot to hand whip", "Látigo de estrella invertida a pie a mano", "pop", 4, ["reverse-star", "foot-to-hand"], "foottohand", { guide: "/l-basing/pops-whips-reverse-star-f2h-whip/" }),
+  fl("pops-h2h-bird-chain", "Pops: back bird – H2H – front bird – H2H – back bird", "Pops: pájaro invertido – mano a mano – pájaro – mano a mano – pájaro invertido", "pop", 4, ["back-bird", "hand-to-hand", "front-bird", "hand-to-hand", "back-bird"], "handtohand", { guide: "/l-basing/pops-whips-back-bird-h2h-front-bird-h2h-back-bird/" }),
+  fl("hip-pop-h2h-standing", "Hip pop to hand to hand (standing)", "Pop de cadera a mano a mano (de pie)", "pop", 4, ["standing-h2h"], "standinghandtohand", { guide: "/standing-acrobatics/standing-intermediate-advanced/hip-pop-hand-2-hand/" }),
+  fl("calf-pop-two-high", "Calf pop to two-high", "Pop de gemelos a two-high", "pop", 4, ["two-high"], "twohigh", { guide: "/standing-acrobatics/calf-pop-2high/", safety: {"en":"Standing height: use a mat and a spotter behind the base, and learn the bail-out (flyer steps down forward) first.","es":"Altura de pie: usa colchoneta y un spotter detrás de la base, y aprende antes la salida (el flyer baja hacia delante).","eu":"Zutikako altuera: erabili koltxoneta eta zaintzaile bat basearen atzean, eta ikasi lehenik irteera (flyerra aurrera jaisten da)."} })
 ];
 
 export const SEED = [...FIGURES, ...FLOWS];
+// Built-in figure ids: the only figures a community flow may reference (checked by the app and the sync Worker).
+export const FIG_IDS = new Set(FIGURES.map((x) => x.id));
 
 // Basque (euskara) names. Entries without one show the English name (most washing machines keep their
 // original name in every language).
@@ -203,6 +226,14 @@ const EU = {
   "throne-family": "Tronuaren familia", "bird-family": "Txoriaren familia", "star-family": "Izarraren familia",
   "standing-warmup": "Zutik beroketa", "helicopter": "Helikopteroa", "ninja-star": "Ninja izarra", "catherine-wheel": "Katalinaren gurpila",
   "barrel-roll": "Upela", "corkscrew": "Kortxo-kentzailea", "two-step": "2 urrats", "four-step": "4 urrats",
-  "ballerina": "Balerina", "carousel": "Karrusela", "spiral": "Espirala", "propeller": "Helizea", "waltz": "Valsa"
+  "ballerina": "Balerina", "carousel": "Karrusela", "spiral": "Espirala", "propeller": "Helizea", "waltz": "Valsa",
+  "bird-pops": "Pop-ak txorian (\"krispetak\")", "tempo-thigh-stand": "Tempoa izterretara", "back-whippop-throne": "Bizkarreko whip-pop-a tronura",
+  "pops-throne-f2h-whale": "Pop-ak: tronua – oina eskura – balea hegalaria", "popping-infinity": "Infinitua pop-ekin",
+  "reverse-star-ashtavakrasana-pops": "Pop-ak alderantzizko izarretik ashtavakrasanara", "back-plank-pop-h2h": "Pop-a alderantzizko oholatik eskuz eskura",
+  "star-pop-h2h": "Pop-a izarretik eskuz eskura", "shin-pop-h2h": "Pop-a zangoetatik eskuz eskura", "reverse-bird-pop-h2h": "Pop-a alderantzizko txoritik eskuz eskura",
+  "belly-pop-reverse-h2h": "Sabeleko pop-a alderantzizko eskuz eskura", "pops-reverse-star-f2h-whip": "Alderantzizko izarra – oina eskura whip-a",
+  "pops-h2h-bird-chain": "Pop-ak: alderantzizko txoria – eskuz esku – txoria – eskuz esku – alderantzizko txoria",
+  "hip-pop-h2h-standing": "Aldakako pop-a eskuz eskura (zutik)", "calf-pop-two-high": "Bikietako pop-a two-high-ra", "whip-prep": "Whip-aren prestaketa",
+  "popping-barrel-rolls": "Upelak pop-ekin"
 };
 for (const it of SEED) if (EU[it.id]) it.name.eu = EU[it.id];

@@ -256,5 +256,9 @@ export default {
   sync_off_done: "Sinkronizazioa desaktibatuta. Zure kopia zerbitzaritik ezabatu da.",
   sync_off_offline: "Sinkronizazioa desaktibatuta, baina ezin izan da zerbitzarira iritsi zure kopia ezabatzeko. Aktibatu eta desaktibatu berriro linean zaudenean.",
   install_btn: "Instalatu aplikazioa",
-  install_hint: "Lineaz kanpo dabil instalatu ondoren."
+  install_hint: "Lineaz kanpo dabil instalatu ondoren.",
+  ft_pop: "Pop-ak eta whip-ak",
+  pop_safety_title: "Segurtasuna:",
+  pop_safety: "Mugimendu dinamikoa: zaintzailea izatea gomendatzen da. Ikasi koltxoneta gainean, hasi behetik eta txiki, eta adostu gelditzeko hitz bat.",
+  tutorial_ext: "Tutoriala ({x})"
 };

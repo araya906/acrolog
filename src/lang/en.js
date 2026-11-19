@@ -255,5 +255,9 @@ export default {
   sync_off_done: "Sync off. Your copy was deleted from the server.",
   sync_off_offline: "Sync off, but the server could not be reached to delete your copy. Turn it on and off again when online.",
   install_btn: "Install app",
-  install_hint: "Works offline once installed."
+  install_hint: "Works offline once installed.",
+  ft_pop: "Pops & whips",
+  pop_safety_title: "Safety:",
+  pop_safety: "Dynamic move: a spotter is strongly recommended. Learn it on a mat, start low and small, and agree on a word to stop.",
+  tutorial_ext: "Tutorial ({x})"
 };

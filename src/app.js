@@ -43,6 +43,8 @@ let t = makeT(S.lang);
 
 // ---------- helpers ----------
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+// Text that may be translated ({ en, es, eu }) or plain.
+const txt = (v) => (!v ? "" : typeof v === "string" ? v : v[S.lang] || v.en || "");
 const nm = (it) => (!it ? "?" : typeof it.name === "string" ? it.name : it.name[S.lang] || it.name.en);
 const figs = () => [...S.items.values()].filter((i) => i.kind === "fig");
 const flows = () => [...S.items.values()].filter((i) => i.kind === "flow");
@@ -308,7 +310,8 @@ function itemSheet(it) {
   return sheetTop(nm(it)) + `
     <p class="hint">${esc(it.kind === "fig" ? t("cat_" + it.cat) : t("ft_" + it.type))} · ${esc(t.list("levels")[it.level])} ${dots(it.level)}</p>
     ${it.kind === "flow" ? videoHtml(it) + galleryHtml(it) : galleryHtml(it) + videoHtml(it)}
-    ${it.desc ? `<p class="desc">${esc(it.desc)}</p>` : ""}
+    ${it.type === "pop" ? `<p class="alert warn" role="note"><b>⚠ ${esc(t("pop_safety_title"))}</b> ${esc(t("pop_safety"))}${it.safety ? " " + esc(txt(it.safety)) : ""}</p>` : ""}
+    ${it.desc ? `<p class="desc">${esc(txt(it.desc))}</p>` : ""}
     ${it.kind === "flow" ? (steps.length ? `<ol class="steps-list">${steps.map((id) =>
       `<li><button type="button" class="link" data-act="open" data-id="${esc(id)}">${esc(nm(S.items.get(id)))}</button> ${pill(st(id))}</li>`).join("")}</ol>`
       : `<p class="alert warn">${esc(t("no_steps"))}</p>`) : ""}
@@ -740,6 +743,7 @@ function videoHtml(it) {
   if (it.video) links.push(link(v?.url || it.video, t("watch_on", { x: platformName(it.video) })));
   if (it.ap) links.push(link(ACROPEDIA_BASE + encodeURIComponent(it.ap) + "/", t("acropedia_page")));
   if (it.guide) links.push(link(GUIDE_BASE + it.guide, t("tutorial")));
+  if (Array.isArray(it.ext) && /^https:///.test(it.ext[0])) links.push(link(it.ext[0], t("tutorial_ext", { x: it.ext[1] || platformName(it.ext[0]) })));
   if (!links.length) return "";
   return `<div class="video-box">
     ${v ? `<button type="button" class="player" data-act="play" data-id="${esc(it.id)}">${PLAY}<span>${esc(t("play_video"))}</span>
@@ -758,7 +762,7 @@ function editorSheet(e) {
     <label><span>${esc(t("level"))}</span><select id="e-level">${LEVELS.map((l) => opt(l, t.list("levels")[l], e.level)).join("")}</select></label>
     <label><span>${esc(t("hashtag"))}</span><input id="e-tag" value="${esc(e.tag || "")}" placeholder="acroyoga" autocomplete="off"></label>
     <label><span>${esc(t("video_link"))}</span><input id="e-video" type="url" inputmode="url" value="${esc(e.video || "")}" placeholder="https://youtu.be/…" autocomplete="off"></label>
-    <label><span>${esc(t("description"))}</span><textarea id="e-desc" rows="2">${esc(e.desc || "")}</textarea></label>
+    <label><span>${esc(t("description"))}</span><textarea id="e-desc" rows="2">${esc(txt(e.desc))}</textarea></label>
     ${flow ? `<fieldset><legend>${esc(t("steps"))}</legend>
       <ol class="edit-steps">${e.steps.map((id, i) => `<li><span>${esc(nm(S.items.get(id)))}</span>
         <button type="button" class="x" data-act="step-move" data-i="${i}" data-d="-1" aria-label="↑" ${i ? "" : "disabled"}>↑</button>
@@ -796,6 +800,8 @@ async function saveItem() {
   if (e.video) rec.video = e.video;
   if (e.ap) rec.ap = e.ap;
   if (e.guide) rec.guide = e.guide;
+  if (e.ext) rec.ext = e.ext;
+  if (e.safety) rec.safety = e.safety;
   if (e.kind === "flow") Object.assign(rec, { type: e.type, steps: e.steps });
   else rec.cat = e.cat;
   await put("items", rec);
