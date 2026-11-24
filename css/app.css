@@ -80,7 +80,7 @@ input, select, textarea { width: 100%; font: inherit; color: var(--text); backgr
 .tag button { border: 0; background: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 0 6px; }
 
 /* item cards */
-.lvl-h { display: flex; gap: 8px; align-items: baseline; margin: 18px 0 8px; }
+.lvl-h { display: flex; gap: 8px; align-items: baseline; margin: 18px 0 8px; font-size: 1rem; }
 .items { display: grid; gap: 8px; margin-bottom: 12px; }
 @media (min-width: 640px) { .items { grid-template-columns: 1fr 1fr; } }
 .item { display: flex; flex-direction: column; gap: 4px; text-align: left; width: 100%; border: 1px solid var(--line);

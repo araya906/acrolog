@@ -230,7 +230,7 @@ function byLevel(list, view = "list") {
     const xs = list.filter((i) => i.level === l);
     if (!xs.length) return "";
     const body = view === "grid" ? `<div class="grid">${xs.map(gridCard).join("")}</div>` : `<div class="items">${xs.map(itemCard).join("")}</div>`;
-    return `<h3 class="lvl-h">${esc(t.list("levels")[l])} <span class="hint">${xs.length}</span></h3>${body}`;
+    return `<h2 class="lvl-h">${esc(t.list("levels")[l])} <span class="hint">${xs.length}</span></h2>${body}`;
   }).join("");
 }
 
