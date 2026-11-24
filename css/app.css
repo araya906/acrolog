@@ -1,6 +1,6 @@
 :root {
   --bg: #f5f4f1; --surface: #ffffff; --text: #1c1f24; --muted: #5d636b; --line: #dcdde0;
-  --accent: #c2512f; --accent-ink: #ffffff; --head: #1d2b3a; --head-ink: #f2efe8;
+  --accent: #b34a2a; --accent-ink: #ffffff; --head: #1d2b3a; --head-ink: #f2efe8;
   --warn-bg: #fff3d6; --warn-ink: #6b4a00; --err-bg: #fde4e1; --err-ink: #8a1f12; --ok-bg: #e2f2df; --ok-ink: #1f5a24;
   --s0: #c9ccd1; --s1: #e9b949; --s2: #e2853b; --s3: #3f9a68; --s4: #5b55c9;
   --radius: 12px; --tabs-h: 64px;
@@ -80,7 +80,7 @@ input, select, textarea { width: 100%; font: inherit; color: var(--text); backgr
 .tag button { border: 0; background: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 0 6px; }
 
 /* item cards */
-.lvl-h { display: flex; gap: 8px; align-items: baseline; margin: 18px 0 8px; }
+.lvl-h { display: flex; gap: 8px; align-items: baseline; margin: 18px 0 8px; font-size: 1rem; }
 .items { display: grid; gap: 8px; margin-bottom: 12px; }
 @media (min-width: 640px) { .items { grid-template-columns: 1fr 1fr; } }
 .item { display: flex; flex-direction: column; gap: 4px; text-align: left; width: 100%; border: 1px solid var(--line);
@@ -298,3 +298,10 @@ main { padding-bottom: 76px; }
   .st.s1, .st.s2, .st.s3, .st.s4, .dist .s3, .dist .s4 { color: #10141a; }
   .st.s0, .dist .s0 { color: #eceae6; }
 }
+
+/* links: theme accent instead of the browser's blue (unreadable on the dark background) */
+a { color: var(--accent); }
+/* bottom tabs: long labels (e.g. Basque "Aurrerapena", "Ezarpenak") shrink instead of pushing the last tab off screen */
+.tabs { grid-auto-columns: minmax(0, 1fr); }
+.tabs button { min-width: 0; padding: 0; font-size: clamp(.64rem, 2.9vw, .75rem); letter-spacing: -.02em; }
+.tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
