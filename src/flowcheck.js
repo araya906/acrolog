@@ -54,14 +54,19 @@ export function cleanFlow(o, { dropUnknown = false } = {}) {
   };
 }
 
+// Largest time a Date can hold (ms): above it, new Date(t).toISOString() throws.
+const MAX_TIME = 8.64e15;
+const okTime = (t) => Number.isFinite(t) && t > 0 && t <= MAX_TIME;
+
 // A flow as the server lists it: { id, ...cleanFlow fields, created, updated } or a tombstone { id, gone: true, updated }.
 export function cleanListed(o) {
   if (!o || !CID_RE.test(o.id || "")) return null;
   const updated = Number(o.updated);
-  if (!Number.isFinite(updated) || updated <= 0) return null;
+  if (!okTime(updated)) return null;
   if (o.gone) return { id: o.id, gone: true, updated };
+  const created = Number(o.created);
   try {
-    return { id: o.id, ...cleanFlow(o, { dropUnknown: true }), created: Number(o.created) || updated, updated };
+    return { id: o.id, ...cleanFlow(o, { dropUnknown: true }), created: okTime(created) ? created : updated, updated };
   } catch {
     return null;
   }
