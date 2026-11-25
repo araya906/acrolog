@@ -182,7 +182,7 @@ export default {
   lib_credit: "List and video links from Acropedia, the partner acro skill encyclopedia. Each video belongs to its creator: credit the creators named in the original post.",
   thumbs_title: "Video thumbnails",
   thumbs_label: "Show video thumbnails (loaded from YouTube)",
-  thumbs_hint: "Off by default. When on, flows and the library show the YouTube preview image of their video, which is downloaded from YouTube (i.ytimg.com).",
+  thumbs_hint: "Off by default. When on, flows and the library show the YouTube preview image of their video, which is downloaded from YouTube (i.ytimg.com). In grid view, flows on screen also step through a few frames of their video (not with reduce motion).",
   thumb_credit: "Video frame: YouTube, © the video's creator",
 
   // Friends

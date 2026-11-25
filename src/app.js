@@ -251,7 +251,9 @@ const hueOf = (it) => {
 function gridCard(it) {
   const p = S.progress.get(it.id);
   const thumb = thumbOf(it.id);
-  const pic = thumb ? `<img class="pic" src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+  // A YouTube frame (no photo of yours or reference photo) becomes a short flipbook of the video: see previewTick.
+  const yt = thumb && thumb === ytThumb(it.video) ? videoInfo(it.video).id : "";
+  const pic = thumb ? `<img class="pic" src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer"${yt ? ` data-yt="${esc(yt)}"` : ""}>`
     : `<span class="gen" style="--h:${hueOf(it)}" aria-hidden="true">${GLYPH[it.kind] || ""}<span>${esc(initials(nm(it)))}</span></span>`;
   const roles = S.roles.map((r) => `<span title="${esc(t("role_" + r))}">${esc(t("role_" + r)[0])} <span class="dot s${p?.[r] ?? 0}"></span></span>`).join("");
   return `<button type="button" class="card-g s${st(it.id)}" data-act="open" data-id="${esc(it.id)}">
@@ -260,7 +262,40 @@ function gridCard(it) {
   </button>`;
 }
 
-const LIST_ICO = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`;
+// Grid previews of flows with a YouTube video: cards on screen step through the frames YouTube itself publishes for
+// every video (mq1-mq3, taken at about 1/4, 1/2 and 3/4 of it) next to the usual preview image, so a flow shows
+// a few moments of its movement. Only with video thumbnails on (Settings), only cards on screen, never in a hidden
+// tab or behind a sheet, and not at all with "reduce motion". Frames load from i.ytimg.com like the thumbnail;
+// a missing frame is skipped. Nothing is copied or stored.
+const FRAMES = ["mqdefault", "mq1", "mq2", "mq3"];
+const badFrames = new Map(); // video id -> frames YouTube doesn't have
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+function previewTick() {
+  if (!S.thumbs || reduceMotion.matches || document.hidden || S.sheet) return;
+  const h = innerHeight;
+  for (const img of $$(".tab:not([hidden]) img.pic[data-yt]")) {
+    const r = img.getBoundingClientRect();
+    if (!r.width || r.bottom < 0 || r.top > h || !img.complete) continue;
+    const id = img.dataset.yt, bad = badFrames.get(id) || new Set();
+    const frames = FRAMES.filter((f) => !bad.has(f));
+    if (frames.length < 2) continue;
+    const next = frames[(frames.indexOf(img.dataset.f || "mqdefault") + 1) % frames.length];
+    const pre = new Image();
+    pre.referrerPolicy = "no-referrer";
+    pre.onload = () => {
+      // YouTube answers a missing frame with a 120x90 grey placeholder.
+      if (pre.naturalWidth <= 120) return badFrames.set(id, bad.add(next));
+      if (img.dataset.yt !== id) return;
+      img.src = pre.src;
+      img.dataset.f = next;
+    };
+    pre.onerror = () => badFrames.set(id, bad.add(next));
+    pre.src = `https://i.ytimg.com/vi/${id}/${next}.jpg`;
+  }
+}
+setInterval(previewTick, 1100);
+
+const LIST_ICO =`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`;
 const GRID_ICO = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;
 function renderViewToggles() {
   $$(".viewtog").forEach((el) => {
