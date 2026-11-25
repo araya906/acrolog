@@ -494,12 +494,17 @@ function renderInbox() {
 
 // ---------- detail / editor sheet ----------
 let sheetOpener = null;
+// While a sheet is open, the page behind it can't be focused or clicked: Tab stays in the dialog and
+// screen readers skip the rest, as aria-modal promises.
+const setBackgroundInert = (on) => $$("body > header, body > main, #fab, #tabs").forEach((el) => { el.inert = on; });
+
 function openSheet(state) {
   if ($("#sheet").hidden) sheetOpener = document.activeElement;
   S.sheet = state;
   renderSheet();
   $("#sheet").hidden = false;
   document.body.classList.add("locked");
+  setBackgroundInert(true);
   $("#sheet .sheet").scrollTop = 0;
   $("#sheet-title")?.focus({ preventScroll: true });
 }
@@ -510,6 +515,7 @@ function closeSheet() {
   $("#sheet").hidden = true;
   $("#sheet-body").innerHTML = "";
   document.body.classList.remove("locked");
+  setBackgroundInert(false);
   // Back to what opened the sheet (or the same card, if the list was re-rendered meanwhile).
   const back = sheetOpener?.isConnected ? sheetOpener
     : sheetOpener?.dataset?.id ? $$(`[data-act="${sheetOpener.dataset.act}"]`).find((el) => el.dataset.id === sheetOpener.dataset.id && el.offsetParent) : null;
