@@ -183,7 +183,7 @@ export default {
   lib_credit: "Zerrenda eta bideo-estekak Acropediatik, bikote-akrobaziaren entziklopediatik. Bideo bakoitza bere egilearena da: aipatu jatorrizko argitalpeneko egileak.",
   thumbs_title: "Bideoen miniaturak",
   thumbs_label: "Erakutsi bideoen miniaturak (YouTubetik kargatuak)",
-  thumbs_hint: "Lehenespenez desaktibatuta. Aktibatuta, fluxuek eta liburutegiak beren bideoaren YouTube aurrebista-irudia erakusten dute, YouTubetik (i.ytimg.com) deskargatua.",
+  thumbs_hint: "Lehenespenez desaktibatuta. Aktibatuta, fluxuek eta liburutegiak beren bideoaren YouTube aurrebista-irudia erakusten dute, YouTubetik (i.ytimg.com) deskargatua. Sareta-ikuspegian, pantailan dauden fluxuek beren bideoaren fotograma batzuk ere erakusten dituzte (ez mugimendua murriztuta baduzu).",
   thumb_credit: "Bideo-irudia: YouTube, © bideoaren egilea",
 
   // Lagunak

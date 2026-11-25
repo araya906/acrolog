@@ -182,7 +182,7 @@ export default {
   lib_credit: "Lista y enlaces a vídeos de Acropedia, la enciclopedia de habilidades de partner acro. Cada vídeo pertenece a su creador: menciona a las personas que aparecen en la publicación original.",
   thumbs_title: "Miniaturas de vídeo",
   thumbs_label: "Mostrar miniaturas de vídeo (se cargan desde YouTube)",
-  thumbs_hint: "Desactivado por defecto. Si lo activas, las secuencias y la biblioteca muestran la imagen de vista previa de YouTube, que se descarga de YouTube (i.ytimg.com).",
+  thumbs_hint: "Desactivado por defecto. Si lo activas, las secuencias y la biblioteca muestran la imagen de vista previa de YouTube, que se descarga de YouTube (i.ytimg.com). En la vista de cuadrícula, las secuencias visibles muestran además unos fotogramas de su vídeo (no si reduces el movimiento).",
   thumb_credit: "Fotograma: YouTube, © creador del vídeo",
 
   // Amigos
