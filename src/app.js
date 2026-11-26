@@ -1014,11 +1014,11 @@ function editorSheet(e) {
     <label><span>${esc(t("video_link"))}</span><input id="e-video" type="url" inputmode="url" value="${esc(e.video || "")}" placeholder="https://youtu.be/…" autocomplete="off"></label>
     <label><span>${esc(t("description"))}</span><textarea id="e-desc" rows="2">${esc(txt(e.desc))}</textarea></label>
     ${flow ? `<fieldset><legend>${esc(t("steps"))}</legend>
-      <ol class="edit-steps">${e.steps.map((id, i) => `<li><span>${esc(nm(S.items.get(id)))}</span>
-        <button type="button" class="x" data-act="step-move" data-i="${i}" data-d="-1" aria-label="↑" ${i ? "" : "disabled"}>↑</button>
-        <button type="button" class="x" data-act="step-move" data-i="${i}" data-d="1" aria-label="↓" ${i < e.steps.length - 1 ? "" : "disabled"}>↓</button>
-        <button type="button" class="x" data-act="step-del" data-i="${i}" aria-label="${esc(t("delete"))}">×</button></li>`).join("")}</ol>
-      <div class="inline"><select id="e-add">${itemOptions("", ["fig"])}</select>
+      <ol class="edit-steps">${e.steps.map((id, i) => { const name = nm(S.items.get(id)); return `<li><span>${esc(name)}</span>
+        <button type="button" class="x" data-act="step-move" data-i="${i}" data-d="-1" aria-label="${esc(t("step_up", { name }))}" ${i ? "" : "disabled"}>↑</button>
+        <button type="button" class="x" data-act="step-move" data-i="${i}" data-d="1" aria-label="${esc(t("step_down", { name }))}" ${i < e.steps.length - 1 ? "" : "disabled"}>↓</button>
+        <button type="button" class="x" data-act="step-del" data-i="${i}" aria-label="${esc(t("step_del", { name }))}">×</button></li>`; }).join("")}</ol>
+      <div class="inline"><select id="e-add" aria-label="${esc(t("pick_step"))}">${itemOptions("", ["fig"])}</select>
         <button type="button" class="btn small" data-act="step-add">${esc(t("add"))}</button></div></fieldset>` : ""}
     <p class="alert err" id="e-err" hidden></p>
     <button type="button" class="btn primary wide" data-act="save-item">${esc(t("save"))}</button>`;

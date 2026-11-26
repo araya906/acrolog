@@ -91,6 +91,11 @@ export default {
   hashtag: "Instagram hashtag",
   description: "Description",
   steps: "Steps",
+  pick_item: "Figure or flow to add",
+  pick_step: "Figure to add as a step",
+  step_up: "Move {name} up",
+  step_down: "Move {name} down",
+  step_del: "Remove {name}",
 
   new_session: "New session",
   edit_session: "Edit session",
