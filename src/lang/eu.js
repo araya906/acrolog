@@ -92,6 +92,11 @@ export default {
   hashtag: "Instagrameko traola",
   description: "Deskribapena",
   steps: "Urratsak",
+  pick_item: "Gehitzeko figura edo fluxua",
+  pick_step: "Urrats gisa gehitzeko figura",
+  step_up: "Igo {name}",
+  step_down: "Jaitsi {name}",
+  step_del: "Kendu {name}",
 
   new_session: "Saio berria",
   edit_session: "Editatu saioa",

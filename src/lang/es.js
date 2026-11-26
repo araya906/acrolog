@@ -91,6 +91,11 @@ export default {
   hashtag: "Hashtag de Instagram",
   description: "Descripción",
   steps: "Pasos",
+  pick_item: "Figura o flow para añadir",
+  pick_step: "Figura para añadir como paso",
+  step_up: "Subir {name}",
+  step_down: "Bajar {name}",
+  step_del: "Quitar {name}",
 
   new_session: "Nueva sesión",
   edit_session: "Editar sesión",
