@@ -75,6 +75,7 @@ export default {
   search_ig: "Buscar",
   no_refs: "Sin referencias. Pega el enlace de un reel o compártelo desde Instagram.",
   ref_ph: "https://www.instagram.com/reel/…",
+  ref_label: "Enlace de Instagram para guardar",
   ref_hint: "Las vistas previas se cargan desde Instagram (Meta) solo al pulsar Vista previa.",
   ref_bad: "Pega un enlace válido (https://…)",
   preview: "Vista previa",

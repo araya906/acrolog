@@ -576,7 +576,7 @@ function itemSheet(it) {
     <h3>${IG} Instagram</h3>
     <a class="btn ig" href="${esc(tagUrl(tagOf(it)))}" target="_blank" rel="noopener noreferrer">${esc(t("search_ig"))} #${esc(tagOf(it))}</a>
     <div class="refs">${refs.map((r) => refHtml(r, true)).join("") || `<p class="hint">${esc(t("no_refs"))}</p>`}</div>
-    <div class="inline"><input id="ref-url" type="url" inputmode="url" autocomplete="off" placeholder="${esc(t("ref_ph"))}">
+    <div class="inline"><input id="ref-url" type="url" inputmode="url" autocomplete="off" placeholder="${esc(t("ref_ph"))}" aria-label="${esc(t("ref_label"))}">
       <button type="button" class="btn small" data-act="add-ref" data-id="${esc(it.id)}">${esc(t("add"))}</button></div>
     <p class="hint">${esc(t("ref_hint"))}</p>
     ${usedIn.length ? `<h3>${esc(t("used_in"))}</h3><div class="row">${usedIn.map((fl) =>
@@ -635,7 +635,7 @@ function librarySheet() {
   const n = S.AP?.length || 0;
   return sheetTop(t("lib_title")) + `
     <p class="hint">${esc(t("lib_sheet_hint", { n: n.toLocaleString(S.lang) }))}</p>
-    <input id="lib-q" type="search" autocomplete="off" value="${esc(S.lib.q)}" placeholder="${esc(t("lib_search"))}">
+    <input id="lib-q" type="search" autocomplete="off" value="${esc(S.lib.q)}" placeholder="${esc(t("lib_search"))}" aria-label="${esc(t("lib_search"))}">
     <div class="filters mt">${["", ...AP_TAGS].map((g) => `<button type="button" class="chip" data-act="lib-tag" data-v="${esc(g)}" aria-pressed="${S.lib.tag === g}">${esc(g || t("all"))}</button>`).join("")}</div>
     <label class="check"><input type="checkbox" id="lib-thumbs" ${S.thumbs ? "checked" : ""}><span>${esc(t("thumbs_label"))}</span></label>
     <div id="lib-list">${libList()}</div>
