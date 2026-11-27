@@ -75,6 +75,7 @@ export default {
   search_ig: "Search",
   no_refs: "No references yet. Paste a reel link or share one from Instagram.",
   ref_ph: "https://www.instagram.com/reel/…",
+  ref_label: "Instagram link to save",
   ref_hint: "Previews load from Instagram (Meta) only when you tap Preview.",
   ref_bad: "Paste a valid link (https://…)",
   preview: "Preview",

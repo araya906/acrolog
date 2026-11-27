@@ -76,6 +76,7 @@ export default {
   search_ig: "Bilatu",
   no_refs: "Oraindik ez dago erreferentziarik. Itsatsi reel baten esteka edo partekatu Instagramdik.",
   ref_ph: "https://www.instagram.com/reel/…",
+  ref_label: "Gordetzeko Instagram esteka",
   ref_hint: "Aurrebistak Instagramdik (Meta) kargatzen dira Aurrebista sakatzen duzunean bakarrik.",
   ref_bad: "Itsatsi baliozko esteka bat (https://…)",
   preview: "Aurrebista",
